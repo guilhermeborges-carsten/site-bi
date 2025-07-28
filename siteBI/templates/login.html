@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+{% block content %}
+  <div class="login-container" style="display:flex; align-items:center; justify-content:center; min-height:80vh;">
+    <div class="login-card" style="max-width:350px; width:100%; background:#fff; border-radius:12px; box-shadow:0 2px 12px rgba(0,0,0,0.07); padding:36px 32px 28px 32px; display:flex; flex-direction:column; align-items:center;">
+      <h2 style="color:#003d73; font-weight:600; margin-bottom:24px; letter-spacing:1px;">BI Chamados</h2>
+      <form method="POST" style="width:100%; display:flex; flex-direction:column; gap:12px;">
+        <input type="email" name="email" placeholder="E-mail" required autofocus>
+        <input type="password" name="senha" placeholder="Senha" required>
+        <button type="submit" class="btn" style="margin-top:8px;">Entrar</button>
+      </form>
+      <div class="login-links" style="margin-top:18px;">
+        <a href="{{ url_for('cadastro') }}" style="color:#0056a6; font-size:0.98em; text-decoration:none;">Não tem conta? Cadastre-se</a>
+      </div>
+      {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <div class="login-feedback" style="margin-top:18px; width:100%;">
+            {% for message in messages %}
+              <div class="flash">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,193 @@
+{% extends 'base.html' %}
+{% block title %}Estatísticas{% endblock %}
+{% block content %}
+  <div style="max-width:900px; margin:0 auto;">
+    <h2 style="text-align:center; color:#0056a6; margin-bottom:32px;">Estatísticas dos Chamados</h2>
+    <form method="get" style="max-width:900px; margin:0 auto 24px auto; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); padding:18px 24px; display:flex; flex-wrap:wrap; gap:48px; align-items:center;">
+      <div style="flex:1; min-width:120px;">
+        <label>Status</label>
+        <select name="status" style="width:100%;">
+          <option value="todos">Todos</option>
+          <option value="Aberto" {% if filtros.status=='Aberto' %}selected{% endif %}>Aberto</option>
+          <option value="Em andamento" {% if filtros.status=='Em andamento' %}selected{% endif %}>Em andamento</option>
+          <option value="Finalizado" {% if filtros.status=='Finalizado' %}selected{% endif %}>Finalizado</option>
+          <option value="Fechado" {% if filtros.status=='Fechado' %}selected{% endif %}>Fechado</option>
+        </select>
+      </div>
+      <div style="flex:1; min-width:120px;">
+        <label>Urgência</label>
+        <select name="urgencia" style="width:100%;">
+          <option value="todos">Todas</option>
+          <option value="Baixa" {% if filtros.urgencia=='Baixa' %}selected{% endif %}>Baixa</option>
+          <option value="Média" {% if filtros.urgencia=='Média' %}selected{% endif %}>Média</option>
+          <option value="Alta" {% if filtros.urgencia=='Alta' %}selected{% endif %}>Alta</option>
+        </select>
+      </div>
+      <div style="flex:1; min-width:120px;">
+        <label>Colaborador</label>
+        <select name="colaborador" style="width:100%;">
+          <option value="todos">Todos</option>
+          {% for colab in colaboradores %}
+          <option value="{{ colab.id }}" {% if filtros.colaborador==colab.id|string %}selected{% endif %}>{{ colab.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div style="flex:1; min-width:120px;">
+        <label>Data Inicial</label>
+        <input type="date" name="data_ini" value="{{ filtros.data_ini or '' }}" style="width:100%;">
+      </div>
+      <div style="flex:1; min-width:120px;">
+        <label>Data Final</label>
+        <input type="date" name="data_fim" value="{{ filtros.data_fim or '' }}" style="width:100%;">
+      </div>
+      <button type="submit" class="btn" style="width:auto; min-width:100px; max-width:180px; margin:0; height:42px; align-self:center;">Filtrar</button>
+    </form>
+    <div style="display:flex; flex-wrap:wrap; gap:32px; justify-content:space-between;">
+      <div style="flex:1; min-width:250px;">
+        <h3 style="color:#0056a6;">Chamados por Mês</h3>
+        <canvas id="chartMes" height="180"></canvas>
+        <table style="width:100%; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-top:16px;">
+          <thead><tr><th>Mês</th><th>Qtd</th></tr></thead>
+          <tbody>
+            {% for mes, qtd in por_mes.items()|sort %}
+            <tr><td>{{ mes }}</td><td>{{ qtd }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="flex:1; min-width:250px;">
+        <h3 style="color:#0056a6;">Chamados por Colaborador</h3>
+        <canvas id="chartColab" height="180"></canvas>
+        <table style="width:100%; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); margin-top:16px;">
+          <thead><tr><th>Colaborador</th><th>Qtd</th></tr></thead>
+          <tbody>
+            {% for colab_id, qtd in por_colab.items() %}
+            <tr><td>{{ usuarios[colab_id] if colab_id in usuarios else 'Desconhecido' }}</td><td>{{ qtd }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div style="flex:1; min-width:250px;">
+        <h3 style="color:#0056a6;">Chamados por Urgência</h3>
+        <canvas id="chartUrgencia" height="180"></canvas>
+      </div>
+      <div style="flex:1; min-width:250px;">
+        <h3 style="color:#0056a6;">Chamados por Status</h3>
+        <canvas id="chartStatus" height="180"></canvas>
+      </div>
+      <div style="flex:1; min-width:250px;">
+        <h3 style="color:#0056a6;">Chamados por Segmentação</h3>
+        <canvas id="chartSegmentacao" height="180"></canvas>
+      </div>
+      <div style="flex:1; min-width:250px;">
+        <h3 style="color:#0056a6;">Chamados por Tipo de Projeto</h3>
+        <canvas id="chartTipoProjeto" height="180"></canvas>
+      </div>
+      <div style="flex:1; min-width:250px;">
+        <h3 style="color:#0056a6;">Chamados por Objetivo</h3>
+        <canvas id="chartObjetivo" height="180"></canvas>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Chamados por mês
+    const ctxMes = document.getElementById('chartMes').getContext('2d');
+    new Chart(ctxMes, {
+      type: 'bar',
+      data: {
+        labels: [{% for mes, qtd in por_mes.items()|sort %}'{{ mes }}',{% endfor %}],
+        datasets: [{
+          label: 'Chamados',
+          data: [{% for mes, qtd in por_mes.items()|sort %}{{ qtd }},{% endfor %}],
+          backgroundColor: '#0056a6',
+        }]
+      },
+      options: {responsive:true, plugins:{legend:{display:false}}}
+    });
+    // Chamados por colaborador
+    const ctxColab = document.getElementById('chartColab').getContext('2d');
+    new Chart(ctxColab, {
+      type: 'pie',
+      data: {
+        labels: [{% for colab_id, qtd in por_colab.items() %}'{{ usuarios[colab_id] if colab_id in usuarios else 'Desconhecido' }}',{% endfor %}],
+        datasets: [{
+          label: 'Chamados',
+          data: [{% for colab_id, qtd in por_colab.items() %}{{ qtd }},{% endfor %}],
+          backgroundColor: ['#0056a6','#ffd700','#e10600','#888','#0a7'],
+        }]
+      },
+      options: {responsive:true}
+    });
+    // Chamados por urgência
+    const ctxUrgencia = document.getElementById('chartUrgencia').getContext('2d');
+    new Chart(ctxUrgencia, {
+      type: 'bar',
+      data: {
+        labels: [{% for urg, qtd in por_urgencia.items() %}'{{ urg }}',{% endfor %}],
+        datasets: [{
+          label: 'Chamados',
+          data: [{% for urg, qtd in por_urgencia.items() %}{{ qtd }},{% endfor %}],
+          backgroundColor: '#e10600',
+        }]
+      },
+      options: {responsive:true, plugins:{legend:{display:false}}}
+    });
+    // Chamados por status
+    const ctxStatus = document.getElementById('chartStatus').getContext('2d');
+    new Chart(ctxStatus, {
+      type: 'bar',
+      data: {
+        labels: [{% for st, qtd in por_status.items() %}'{{ st }}',{% endfor %}],
+        datasets: [{
+          label: 'Chamados',
+          data: [{% for st, qtd in por_status.items() %}{{ qtd }},{% endfor %}],
+          backgroundColor: '#ffd700',
+        }]
+      },
+      options: {responsive:true, plugins:{legend:{display:false}}}
+    });
+    // Chamados por segmentação
+    const ctxSegmentacao = document.getElementById('chartSegmentacao').getContext('2d');
+    new Chart(ctxSegmentacao, {
+      type: 'bar',
+      data: {
+        labels: [{% for seg, qtd in por_segmentacao.items() %}'{{ seg }}',{% endfor %}],
+        datasets: [{
+          label: 'Chamados',
+          data: [{% for seg, qtd in por_segmentacao.items() %}{{ qtd }},{% endfor %}],
+          backgroundColor: '#0a7',
+        }]
+      },
+      options: {responsive:true, plugins:{legend:{display:false}}}
+    });
+    // Chamados por tipo de projeto
+    const ctxTipoProjeto = document.getElementById('chartTipoProjeto').getContext('2d');
+    new Chart(ctxTipoProjeto, {
+      type: 'bar',
+      data: {
+        labels: [{% for tp, qtd in por_tipo_projeto.items() %}'{{ tp }}',{% endfor %}],
+        datasets: [{
+          label: 'Chamados',
+          data: [{% for tp, qtd in por_tipo_projeto.items() %}{{ qtd }},{% endfor %}],
+          backgroundColor: '#0056a6',
+        }]
+      },
+      options: {responsive:true, plugins:{legend:{display:false}}}
+    });
+    // Chamados por objetivo
+    const ctxObjetivo = document.getElementById('chartObjetivo').getContext('2d');
+    new Chart(ctxObjetivo, {
+      type: 'bar',
+      data: {
+        labels: [{% for obj, qtd in por_objetivo.items() %}'{{ obj }}',{% endfor %}],
+        datasets: [{
+          label: 'Chamados',
+          data: [{% for obj, qtd in por_objetivo.items() %}{{ qtd }},{% endfor %}],
+          backgroundColor: '#888',
+        }]
+      },
+      options: {responsive:true, plugins:{legend:{display:false}}}
+    });
+  </script>
+{% endblock %} 

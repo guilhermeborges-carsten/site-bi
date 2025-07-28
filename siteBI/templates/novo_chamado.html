@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% block title %}Novo Chamado{% endblock %}
+{% block content %}
+  <div class="login-container" style="max-width:500px;">
+    <h2>Abrir Novo Chamado</h2>
+    <form method="POST" enctype="multipart/form-data">
+      <label for="titulo">Qual o nome ou a ideia principal do projeto?</label>
+      <input name="titulo" id="titulo" placeholder="Ex: Dashboard de Vendas" required>
+
+      <label for="cargo">Qual é o seu cargo na empresa?</label>
+      <input name="cargo" id="cargo" placeholder="Ex: Analista de BI" required>
+
+      <label for="setor">A qual setor você pertence?</label>
+      <input name="setor" id="setor" placeholder="Ex: Comercial" required>
+
+      <label for="urgencia">Qual o nível de urgência?</label>
+      <select name="urgencia" id="urgencia" required style="margin-bottom:10px;">
+        <option value="">Selecione...</option>
+        <option value="Baixa">Baixa</option>
+        <option value="Média">Média</option>
+        <option value="Alta">Alta</option>
+        <option value="Crítica">Crítica</option>
+      </select>
+
+      <label for="segmentacao">Este projeto se enquadra em qual segmentação?</label>
+      <select name="segmentacao" id="segmentacao" required style="margin-bottom:10px;">
+        <option value="">Selecione...</option>
+        <option value="Atualização">Atualização</option>
+        <option value="Correção">Correção</option>
+        <option value="Desenvolvimento">Desenvolvimento</option>
+      </select>
+
+      <label for="tipo_projeto">Como você classificaria o tipo de projeto?</label>
+      <select name="tipo_projeto" id="tipo_projeto" required style="margin-bottom:10px;">
+        <option value="">Selecione...</option>
+        <option value="Operacional">Operacional (Tarefas do dia a dia)</option>
+        <option value="Tático">Tático (Suporte a áreas e processos)</option>
+        <option value="Estratégico">Estratégico (Apoio à estratégia do negócio)</option>
+      </select>
+
+      <label for="objetivo">Qual é o principal objetivo da solicitação?</label>
+      <select name="objetivo" id="objetivo" required style="margin-bottom:10px;">
+        <option value="">Selecione...</option>
+        <option value="Análise de Dados">Análise de Dados</option>
+        <option value="Aumento de Produtividade e Receita">Aumento de Produtividade e Receita</option>
+        <option value="Redução de Custo">Redução de Custo</option>
+      </select>
+
+      <label for="descricao">Quais recursos ou informações você pode fornecer para apoiar o desenvolvimento deste projeto?</label>
+      <textarea name="descricao" id="descricao" placeholder="Descreva recursos, dados, sistemas envolvidos, etc." required></textarea>
+
+      <label for="anexo">Anexar arquivo (opcional)</label>
+      <input type="file" name="anexo" id="anexo" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.txt,.csv">
+      <button type="submit" class="btn btn-success" style="width:100%; margin-top:16px;"><i class="fa fa-paper-plane"></i> Enviar</button>
+    </form>
+  </div>
+{% endblock %}

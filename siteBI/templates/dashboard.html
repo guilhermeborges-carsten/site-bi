@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+  <h1 style="text-align:center; color:#0056a6; margin-bottom:32px;">Bem-vindo, {{ current_user.nome }}</h1>
+  {% if current_user.tipo == 'admin' %}
+  <form method="get" style="max-width:700px; margin:0 auto 24px auto; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); padding:18px 24px; display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+    <div style="flex:1; min-width:120px;">
+      <label>Status</label>
+      <select name="status" style="width:100%;">
+        <option value="todos">Todos</option>
+        <option value="Aberto" {% if filtros.status=='Aberto' %}selected{% endif %}>Aberto</option>
+        <option value="Em andamento" {% if filtros.status=='Em andamento' %}selected{% endif %}>Em andamento</option>
+        <option value="Finalizado" {% if filtros.status=='Finalizado' %}selected{% endif %}>Finalizado</option>
+        <option value="Fechado" {% if filtros.status=='Fechado' %}selected{% endif %}>Fechado</option>
+      </select>
+    </div>
+    <div style="flex:1; min-width:120px;">
+      <label>Urgência</label>
+      <select name="urgencia" style="width:100%;">
+        <option value="todos">Todas</option>
+        <option value="Baixa" {% if filtros.urgencia=='Baixa' %}selected{% endif %}>Baixa</option>
+        <option value="Média" {% if filtros.urgencia=='Média' %}selected{% endif %}>Média</option>
+        <option value="Alta" {% if filtros.urgencia=='Alta' %}selected{% endif %}>Alta</option>
+      </select>
+    </div>
+    <div style="flex:1; min-width:120px;">
+      <label>Colaborador</label>
+      <select name="colaborador" style="width:100%;">
+        <option value="todos">Todos</option>
+        {% for colab in colaboradores %}
+        <option value="{{ colab.id }}" {% if filtros.colaborador==colab.id|string %}selected{% endif %}>{{ colab.nome }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="flex:1; min-width:120px;">
+      <label>Data Inicial</label>
+      <input type="date" name="data_ini" value="{{ filtros.data_ini or '' }}" style="width:100%;">
+    </div>
+    <div style="flex:1; min-width:120px;">
+      <label>Data Final</label>
+      <input type="date" name="data_fim" value="{{ filtros.data_fim or '' }}" style="width:100%;">
+    </div>
+    <div style="flex:0 0 100px;">
+      <button type="submit" style="margin-top:18px;">Filtrar</button>
+    </div>
+  </form>
+  {% else %}
+  <form method="get" style="max-width:700px; margin:0 auto 24px auto; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); padding:18px 24px; display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+    <div style="flex:1; min-width:120px;">
+      <label>Status</label>
+      <select name="status" style="width:100%;">
+        <option value="todos">Todos</option>
+        <option value="Aberto" {% if filtros.status=='Aberto' %}selected{% endif %}>Aberto</option>
+        <option value="Em andamento" {% if filtros.status=='Em andamento' %}selected{% endif %}>Em andamento</option>
+        <option value="Finalizado" {% if filtros.status=='Finalizado' %}selected{% endif %}>Finalizado</option>
+        <option value="Fechado" {% if filtros.status=='Fechado' %}selected{% endif %}>Fechado</option>
+      </select>
+    </div>
+    <div style="flex:1; min-width:120px;">
+      <label>Urgência</label>
+      <select name="urgencia" style="width:100%;">
+        <option value="todos">Todas</option>
+        <option value="Baixa" {% if filtros.urgencia=='Baixa' %}selected{% endif %}>Baixa</option>
+        <option value="Média" {% if filtros.urgencia=='Média' %}selected{% endif %}>Média</option>
+        <option value="Alta" {% if filtros.urgencia=='Alta' %}selected{% endif %}>Alta</option>
+      </select>
+    </div>
+    <div style="flex:1; min-width:120px;">
+      <label>Categoria</label>
+      <select name="categoria" style="width:100%;">
+        <option value="todas">Todas</option>
+        {% for cat in categorias %}
+        <option value="{{ cat }}" {% if filtros.categoria==cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div style="flex:1; min-width:120px;">
+      <label>Data Inicial</label>
+      <input type="date" name="data_ini" value="{{ filtros.data_ini or '' }}" style="width:100%;">
+    </div>
+    <div style="flex:1; min-width:120px;">
+      <label>Data Final</label>
+      <input type="date" name="data_fim" value="{{ filtros.data_fim or '' }}" style="width:100%;">
+    </div>
+    <div style="flex:0 0 100px;">
+      <button type="submit" style="margin-top:18px;">Filtrar</button>
+    </div>
+  </form>
+  {% endif %}
+  <div style="max-width:700px; margin:0 auto;">
+    <ul style="padding:0; list-style:none;">
+      {% for c in chamados %}
+      <li style="background:#fff; border-left:6px solid {% if c.status == 'Aberto' %}#ffd700{% elif c.status == 'Fechado' %}#e10600{% elif c.status == 'Finalizado' %}#0056a6{% elif c.status == 'Em andamento' %}#ffd700{% else %}#0056a6{% endif %}; margin-bottom:18px; padding:18px 24px; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.04); display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <a href="{{ url_for('detalhes_chamado', id=c.id) }}" style="font-size:1.1em; color:#0056a6; font-weight:bold; text-decoration:none;">
+            {{ c.titulo }}
+            {% if chamados_nao_lidos and c.id in chamados_nao_lidos %}
+              <span title="Nova mensagem não lida" style="color:#e10600; font-size:1.2em; margin-left:6px;">🔔</span>
+            {% endif %}
+          </a>
+          <br>
+          <span style="font-size:0.95em; color:#888;">Protocolo: <b>{{ c.protocolo }}</b></span>
+          <span style="margin-left:16px; font-size:0.95em; color:#888;">Status: <b>{{ c.status }}</b></span>
+          <br>
+          <span style="font-size:0.95em; color:#888;">Responsável: <b>{% if c.responsavel %}{{ c.responsavel.nome }}{% else %}Não atribuído{% endif %}</b></span>
+          {% if current_user.tipo == 'admin' %}
+          <form method="POST" action="{{ url_for('atribuir_responsavel', chamado_id=c.id) }}" style="display:inline; margin-left:12px;">
+            <select name="responsavel_id" style="padding:2px 8px;">
+              <option value="">-- Escolher admin --</option>
+              {% for admin in colaboradores if admin.tipo == 'admin' %}
+                <option value="{{ admin.id }}" {% if c.responsavel_id == admin.id %}selected{% endif %}>{{ admin.nome }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" style="padding:2px 10px; font-size:0.95em;">Atribuir</button>
+          </form>
+          {% endif %}
+        </div>
+      </li>
+      {% else %}
+      <li style="text-align:center; color:#888;">Nenhum chamado encontrado.</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Gerenciar Colunas - Daily Board{% endblock %}
+{% block content %}
+  <div class="login-container" style="max-width:900px;">
+    <h2>Gerenciar Colunas do Daily Board</h2>
+    <form method="POST" class="filtros-box" style="margin-bottom:18px; gap:8px; padding:12px 12px;">
+      <input type="text" name="nome" placeholder="Nome da coluna" required style="max-width:180px; height:32px; font-size:0.98em; padding:6px 8px;">
+      <input type="number" name="ordem" placeholder="Ordem" min="1" style="max-width:70px; height:32px; font-size:0.98em; padding:6px 8px;">
+      <button type="submit" class="btn" style="padding:6px 16px; font-size:0.98em; height:32px;"><i class="fa fa-plus"></i> Adicionar Coluna</button>
+    </form>
+    <table class="table" style="font-size:0.98em;">
+      <thead><tr><th>Nome</th><th>Ordem</th><th>Ações</th><th>Adicionar Tarefa</th></tr></thead>
+      <tbody>
+        {% for lista in listas %}
+        <tr>
+          <form method="POST" action="{{ url_for('editar_lista_kanban', lista_id=lista.id) }}">
+            <td><input type="text" name="nome" value="{{ lista.nome }}" required style="max-width:120px; height:28px; font-size:0.96em; padding:4px 6px;"></td>
+            <td><input type="number" name="ordem" value="{{ lista.ordem }}" min="1" style="max-width:50px; height:28px; font-size:0.96em; padding:4px 6px;"></td>
+            <td style="min-width:120px;">
+              <div style="display:flex; gap:6px; align-items:center;">
+                <button type="submit" class="btn btn-success" style="padding:5px 12px; font-size:0.96em; height:28px; min-width:unset;"><i class="fa fa-save"></i></button>
+          </form>
+          <form method="POST" action="{{ url_for('excluir_lista_kanban', lista_id=lista.id) }}" style="display:inline;" onsubmit="return confirm('Excluir esta coluna?');">
+                <button type="submit" class="btn btn-danger" style="padding:5px 12px; font-size:0.96em; height:28px; min-width:unset;"><i class="fa fa-trash"></i></button>
+          </form>
+              </div>
+            </td>
+            <td>
+              <form method="POST" action="{{ url_for('dailyboard_listas') }}" style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                <input type="hidden" name="lista_id" value="{{ lista.id }}">
+                <input type="text" name="titulo" placeholder="Título" required style="max-width:90px; height:28px; font-size:0.96em; padding:4px 6px;">
+                <input type="text" name="descricao" placeholder="Descrição" style="max-width:90px; height:28px; font-size:0.96em; padding:4px 6px;">
+                <select name="responsavel_id" style="max-width:90px; height:28px; font-size:0.96em; padding:4px 6px;">
+                  <option value="">Resp.</option>
+                  {% for u in usuarios if u.tipo == 'admin' %}
+                  <option value="{{ u.id }}">{{ u.nome }}</option>
+                  {% endfor %}
+                </select>
+                <button type="submit" class="btn btn-success" style="padding:5px 12px; font-size:0.96em; height:28px; min-width:unset;"><i class="fa fa-plus"></i></button>
+              </form>
+            </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div style="text-align:center; margin-top:16px;">
+      <a href="{{ url_for('dailyboard') }}" class="btn" style="padding:6px 16px; font-size:0.98em; height:32px;"><i class="fa fa-arrow-left"></i> Voltar</a>
+    </div>
+  </div>
+{% endblock %} 

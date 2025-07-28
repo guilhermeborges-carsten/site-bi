@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Controle de Usuários{% endblock %}
+{% block content %}
+  <div style="max-width:900px; margin:0 auto;">
+    <h2 style="text-align:center; color:#0056a6; margin-bottom:32px;">Controle de Usuários</h2>
+    <table style="width:100%; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); overflow:hidden;">
+      <thead style="background:#0056a6; color:#fff;">
+        <tr>
+          <th style="padding:12px;">ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+          <th>Tipo</th>
+          {% if current_user.tipo == 'admin' %}<th>Ações</th>{% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for usuario in usuarios %}
+        <tr style="text-align:center; border-bottom:1px solid #eee;">
+          <td style="padding:10px;">{{ usuario.id }}</td>
+          <td>{{ usuario.nome }}</td>
+          <td>{{ usuario.email }}</td>
+          <td>{% if usuario.tipo == 'admin' %}<span style="color:#e10600; font-weight:bold;">Admin</span>{% else %}Usuário{% endif %}</td>
+          {% if current_user.tipo == 'admin' %}
+          <td>
+            <a href="{{ url_for('editar_usuario', id=usuario.id) }}" style="color:#0056a6; font-weight:bold; margin-right:10px;">Editar</a>
+            <form method="POST" action="{{ url_for('excluir_usuario', id=usuario.id) }}" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
+              <button type="submit" style="background:#e10600; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-weight:bold; cursor:pointer;">Excluir</button>
+            </form>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %} 
