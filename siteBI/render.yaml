@@ -1,0 +1,3 @@
+build:
+  buildCommand: poetry install
+  startCommand: poetry run python app.py  # ou app.py, ou o nome correto do seu script Flask
