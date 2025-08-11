@@ -1,93 +1,183 @@
 {% extends 'base.html' %}
 {% block title %}Daily Board{% endblock %}
 {% block content %}
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-    <h2 style="color:#0056a6; margin-bottom:0;">Daily Board</h2>
-    <a href="{{ url_for('dailyboard_historico') }}" class="btn" style="background:#0056a6; color:#fff; padding:10px 24px; border-radius:6px; text-decoration:none; font-weight:bold;">Histórico de Dailys</a>
-  </div>
-   <!-- CORRIGIDO: Formulário de Busca alinhado e centralizado -->
-   <div style="margin-bottom:24px; display:flex; justify-content:center;">
-    <form method="get" style="display:flex; gap:12px; align-items:center; max-width:420px; width:100%;">
-      <div style="flex:1; min-width:120px; margin-bottom:0;">
-        <label for="protocolo" style="font-weight:600; color:#003d73;">Buscar por Protocolo</label>
-        <input type="text" id="protocolo" name="protocolo" value="{{ request.args.get('protocolo', '') }}" placeholder="Digite o protocolo..." style="width:100%; min-width:0;">
+  <div class="fade-in">
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <h1 style="color: #2d3748; margin: 0; font-size: 2rem; font-weight: 700;">
+          <i class="fas fa-tasks"></i> Daily Board
+        </h1>
+        <a href="{{ url_for('dailyboard_historico') }}" class="btn">
+          <i class="fas fa-history"></i> Histórico de Dailys
+        </a>
       </div>
-      <button type="submit" class="btn" style="background:#0056a6; color:#fff; white-space:nowrap; margin-bottom:0;">Buscar</button>
-    </form>
-  </div>
-  <div id="kanban-board" style="display:flex; gap:24px; overflow-x:auto;">
-    {% for lista in listas %}
-    <div class="kanban-list" style="background:#f4f4f4; border-radius:8px; min-width:300px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.04);">
-      <h3 style="color:#0056a6; text-align:center;">{{ lista.nome }}</h3>
-      <div class="kanban-cards" data-lista-id="{{ lista.id }}">
-        {% for card in lista.cards|selectattr('excluido', 'equalto', False)|sort(attribute='ordem') %}
-        <div class="kanban-card" data-id="{{ card.id }}" style="background:#fff; border-radius:6px; margin-bottom:12px; padding:12px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
-          <div style="font-weight:bold; color:#0056a6;"><a href="{{ url_for('dailyboard_card', card_id=card.id) }}" style="color:#0056a6; text-decoration:underline;">{{ card.titulo }}
-            {% if card.chamado_id and chamados_nao_lidos and card.chamado_id in chamados_nao_lidos %}
-              <span title="Nova mensagem não lida" style="color:#e10600; font-size:1.2em; margin-left:6px;">🔔</span>
-            {% endif %}
-          </a></div>
-          {% if card.chamado_id and chamados_dict[card.chamado_id] is defined %}
-            {% set chamado = chamados_dict[card.chamado_id] %}
-            <div style="font-size:0.95em; color:#888;">Usuário: <b>{% if chamado.usuario %}{{ chamado.usuario.nome }}{% else %}Desconhecido{% endif %}</b></div>
-            <div style="font-size:0.95em; color:#888;">Protocolo: <b>{{ chamado.protocolo }}</b></div>
-          {% endif %}
-          {% set responsavel = (usuarios|selectattr('id', 'equalto', card.responsavel_id)|first) %}
-          <div style="font-size:0.95em; color:#888; margin-bottom:6px;">
-            Responsável: <b>{% if responsavel %}{{ responsavel.nome }}{% else %}Time de BI{% endif %}</b>
-            {% if current_user.tipo == 'admin' and card.chamado_id %}
-            <form method="POST" action="{{ url_for('atribuir_responsavel', chamado_id=card.chamado_id) }}" style="display:inline; margin-left:8px;">
-              <select name="responsavel_id" style="padding:2px 8px;">
-                <option value="">Time de BI</option>
-                {% for admin in usuarios if admin.tipo == 'admin' %}
-                  <option value="{{ admin.id }}" {% if card.responsavel_id == admin.id %}selected{% endif %}>{{ admin.nome }}</option>
-                {% endfor %}
-              </select>
-              <button type="submit" style="padding:2px 10px; font-size:0.95em;">Atribuir</button>
-            </form>
-            {% endif %}
+      
+      <!-- Formulário de Busca -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <h3 style="margin-bottom: 1.5rem; color: #2d3748; font-weight: 600;">
+          <i class="fas fa-search"></i> Buscar por Protocolo
+        </h3>
+        <form method="get" style="display: flex; gap: 1rem; align-items: end; max-width: 500px;">
+          <div class="form-group" style="flex: 1; margin-bottom: 0;">
+            <input type="text" id="protocolo" name="protocolo" value="{{ request.args.get('protocolo', '') }}" placeholder="Digite o protocolo...">
           </div>
-          <div style="font-size:0.95em; color:#444; margin-bottom:8px;">{{ card.descricao }}</div>
-          <div style="font-size:0.9em; color:#888;">Comentários: {{ card.comentarios|length }}</div>
-          <form method="POST" action="{{ url_for('finalizar_card_kanban', card_id=card.id) }}" style="margin-top:8px; display:inline-block;">
-            <button type="submit" style="background:#0056a6; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-weight:bold; cursor:pointer;">Finalizar</button>
-          </form>
-          {% if lista and ("conclu" in lista.nome|lower or "finaliz" in lista.nome|lower) %}
-          <form method="POST" action="{{ url_for('excluir_card_kanban', card_id=card.id) }}" style="display:inline-block; margin-left:8px;" onsubmit="return confirm('Excluir esta daily?');">
-            <button type="submit" style="background:#e10600; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-weight:bold; cursor:pointer;">Excluir</button>
-          </form>
-          <form method="POST" action="{{ url_for('voltar_backlog_card_kanban', card_id=card.id) }}" style="display:inline-block; margin-left:8px;">
-            <button type="submit" style="background:#888; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-weight:bold; cursor:pointer;">Voltar para Backlog</button>
-          </form>
-          {% endif %}
-          {% if lista and ("andamento" not in lista.nome|lower and "conclu" not in lista.nome|lower and "finaliz" not in lista.nome|lower) %}
-          <form method="POST" action="{{ url_for('em_andamento_card_kanban', card_id=card.id) }}" style="display:inline-block; margin-left:8px;">
-            <button type="submit" style="background:#ffd700; color:#0056a6; border:none; border-radius:4px; padding:6px 12px; font-weight:bold; cursor:pointer;">Em andamento</button>
-          </form>
-          {% endif %}
+          <button type="submit" class="btn">
+            <i class="fas fa-search"></i> Buscar
+          </button>
+        </form>
+      </div>
+      
+      <!-- Kanban Board -->
+      <div class="kanban-board">
+        {% for lista in listas %}
+        <div class="kanban-column">
+          <h3>{{ lista.nome }}</h3>
+          <div class="kanban-cards" data-lista-id="{{ lista.id }}">
+            {% for card in lista.cards|selectattr('excluido', 'equalto', False)|sort(attribute='ordem') %}
+            <div class="kanban-card slide-up" data-id="{{ card.id }}">
+              <div style="margin-bottom: 0.5rem;">
+                <a href="{{ url_for('dailyboard_card', card_id=card.id) }}" style="color: #2d3748; text-decoration: none; font-weight: 600; font-size: 1.1rem;">
+                  {{ card.titulo }}
+                  {% if card.chamado_id and chamados_nao_lidos and card.chamado_id in chamados_nao_lidos %}
+                    <i class="fas fa-bell" style="color: #e53e3e; margin-left: 0.5rem;" title="Nova mensagem não lida"></i>
+                  {% endif %}
+                </a>
+              </div>
+              
+              {% if card.chamado_id and chamados_dict[card.chamado_id] is defined %}
+                {% set chamado = chamados_dict[card.chamado_id] %}
+                <div style="font-size: 0.9rem; color: #718096; margin-bottom: 0.5rem;">
+                  <i class="fas fa-user"></i> Usuário: <strong>{% if chamado.usuario %}{{ chamado.usuario.nome }}{% else %}Desconhecido{% endif %}</strong>
+                </div>
+                <div style="font-size: 0.9rem; color: #718096; margin-bottom: 0.5rem;">
+                  <i class="fas fa-hashtag"></i> Protocolo: <strong>{{ chamado.protocolo }}</strong>
+                </div>
+              {% endif %}
+              
+              {% set responsavel = (usuarios|selectattr('id', 'equalto', card.responsavel_id)|first) %}
+              <div style="font-size: 0.9rem; color: #718096; margin-bottom: 0.5rem;">
+                <i class="fas fa-user-tie"></i> Responsável: <strong>{% if responsavel %}{{ responsavel.nome }}{% else %}Time de BI{% endif %}</strong>
+                {% if current_user.tipo == 'admin' and card.chamado_id %}
+                <form method="POST" action="{{ url_for('atribuir_responsavel', chamado_id=card.chamado_id) }}" style="display: inline; margin-left: 0.5rem;">
+                  <select name="responsavel_id" style="padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 0.85rem;">
+                    <option value="">Time de BI</option>
+                    {% for admin in usuarios if admin.tipo == 'admin' %}
+                      <option value="{{ admin.id }}" {% if card.responsavel_id == admin.id %}selected{% endif %}>{{ admin.nome }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.85rem; margin-left: 0.25rem;">
+                    <i class="fas fa-user-plus"></i> Atribuir
+                  </button>
+                </form>
+                {% endif %}
+              </div>
+              
+              <div style="font-size: 0.9rem; color: #4a5568; margin-bottom: 0.5rem;">{{ card.descricao }}</div>
+              <div style="font-size: 0.85rem; color: #718096; margin-bottom: 1rem;">
+                <i class="fas fa-comments"></i> Comentários: {{ card.comentarios|length }}
+              </div>
+              
+              <!-- Botões de ação -->
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <form method="POST" action="{{ url_for('finalizar_card_kanban', card_id=card.id) }}" style="margin: 0;">
+                  <button type="submit" class="btn">
+                    <i class="fas fa-check"></i> Finalizar
+                  </button>
+                </form>
+                
+                {% if lista and ("conclu" in lista.nome|lower or "finaliz" in lista.nome|lower) %}
+                <form method="POST" action="{{ url_for('excluir_card_kanban', card_id=card.id) }}" style="margin: 0;" onsubmit="return confirm('Excluir esta daily?');">
+                  <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Excluir
+                  </button>
+                </form>
+                <form method="POST" action="{{ url_for('voltar_backlog_card_kanban', card_id=card.id) }}" style="margin: 0;">
+                  <button type="submit" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Voltar para Backlog
+                  </button>
+                </form>
+                {% endif %}
+                
+                {% if lista and ("andamento" not in lista.nome|lower and "conclu" not in lista.nome|lower and "finaliz" not in lista.nome|lower) %}
+                <form method="POST" action="{{ url_for('em_andamento_card_kanban', card_id=card.id) }}" style="margin: 0;">
+                  <button type="submit" class="btn" style="background: linear-gradient(45deg, #ed8936, #dd6b20);">
+                    <i class="fas fa-play"></i> Em andamento
+                  </button>
+                </form>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
         </div>
         {% endfor %}
       </div>
     </div>
-    {% endfor %}
   </div>
+
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
   <script>
-    document.querySelectorAll('.kanban-cards').forEach(function(list) {
-      new Sortable(list, {
-        group: 'kanban',
-        animation: 150,
-        onEnd: function (evt) {
-          const cardEl = evt.item;
-          const cardId = cardEl.getAttribute('data-id');
-          const novaListaId = evt.to.getAttribute('data-lista-id');
-          const novaOrdem = Array.from(evt.to.children).map(el => el.getAttribute('data-id')).filter(Boolean);
-          fetch('/dailyboard/mover_card', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({card_id: cardId, nova_lista_id: novaListaId, nova_ordem: novaOrdem})
-          });
-        }
+    // Otimização: Debounce para evitar múltiplas requisições
+    function debounce(func, wait) {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    }
+
+    // Inicializar Sortable com otimizações
+    document.addEventListener('DOMContentLoaded', function() {
+      const lists = document.querySelectorAll('.kanban-cards');
+      
+      lists.forEach(function(list) {
+        new Sortable(list, {
+          group: 'kanban',
+          animation: 100, // Reduzido para melhor performance
+          ghostClass: 'sortable-ghost',
+          chosenClass: 'sortable-chosen',
+          dragClass: 'sortable-drag',
+          onStart: function() {
+            // Adicionar classe para otimizar durante o drag
+            document.body.classList.add('dragging');
+          },
+          onEnd: debounce(function (evt) {
+            document.body.classList.remove('dragging');
+            
+            const cardEl = evt.item;
+            const cardId = cardEl.getAttribute('data-id');
+            const novaListaId = evt.to.getAttribute('data-lista-id');
+            const novaOrdem = Array.from(evt.to.children).map(el => el.getAttribute('data-id')).filter(Boolean);
+            
+            // Usar fetch com timeout
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            fetch('/dailyboard/mover_card', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({card_id: cardId, nova_lista_id: novaListaId, nova_ordem: novaOrdem}),
+              signal: controller.signal
+            })
+            .then(response => response.json())
+            .then(data => {
+              clearTimeout(timeoutId);
+              if (!data.success) {
+                console.error('Erro ao mover card');
+              }
+            })
+            .catch(error => {
+              clearTimeout(timeoutId);
+              if (error.name !== 'AbortError') {
+                console.error('Erro na requisição:', error);
+              }
+            });
+          }, 300) // Debounce de 300ms
+        });
       });
     });
   </script>

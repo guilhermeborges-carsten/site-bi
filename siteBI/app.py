@@ -14,6 +14,9 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chamados.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+
+# Configurações de performance
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # 1 ano de cache para arquivos estáticos
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'csv'}
 
 BR_TZ = pytz.timezone('America/Sao_Paulo')
@@ -80,6 +83,7 @@ class CardKanban(db.Model):
     excluido = db.Column(db.Boolean, default=False)  # novo campo
     comentarios = db.relationship('ComentarioKanban', backref='card', lazy=True)
     chamado_id = db.Column(db.Integer, db.ForeignKey('chamado.id'))  # novo campo para vincular ao chamado
+    responsavel = db.relationship('Usuario', foreign_keys=[responsavel_id])
 
 class ComentarioKanban(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -556,36 +560,78 @@ def dailyboard_card(card_id):
 def dailyboard_listas():
     if current_user.tipo != 'admin':
         abort(403)
+    
     if request.method == 'POST':
-        # Se for criação de coluna
-        if request.form.get('nome') and not request.form.get('titulo'):
-            nome = request.form.get('nome')
-            ordem = request.form.get('ordem')
-            lista = ListaKanban()
-            lista.nome = nome
-            lista.ordem = ordem or 1
-            db.session.add(lista)
-            db.session.commit()
+        try:
+            # Se for criação de coluna
+            if request.form.get('nome') and not request.form.get('titulo'):
+                nome = request.form.get('nome').strip()
+                ordem = request.form.get('ordem')
+                
+                # Validação rápida
+                if not nome:
+                    flash('Nome da coluna é obrigatório!', 'error')
+                    return redirect(url_for('dailyboard_listas'))
+                
+                # Verificar se já existe uma coluna com este nome
+                if ListaKanban.query.filter(ListaKanban.nome.ilike(nome)).first():
+                    flash('Já existe uma coluna com este nome!', 'error')
+                    return redirect(url_for('dailyboard_listas'))
+                
+                lista = ListaKanban()
+                lista.nome = nome
+                lista.ordem = int(ordem) if ordem and ordem.isdigit() else 1
+                db.session.add(lista)
+                db.session.commit()
+                
+                flash('Coluna criada com sucesso!', 'success')
+                return redirect(url_for('dailyboard_listas'))
+            
+            # Se for criação de card
+            elif request.form.get('titulo') and request.form.get('lista_id'):
+                titulo = request.form.get('titulo').strip()
+                descricao = request.form.get('descricao', '').strip()
+                responsavel_id = request.form.get('responsavel_id')
+                lista_id = request.form.get('lista_id')
+                
+                # Validação rápida
+                if not titulo:
+                    flash('Título da tarefa é obrigatório!', 'error')
+                    return redirect(url_for('dailyboard_listas'))
+                
+                lista = ListaKanban.query.get(lista_id)
+                if not lista:
+                    flash('Coluna não encontrada!', 'error')
+                    return redirect(url_for('dailyboard_listas'))
+                
+                # Otimização: usar count() em vez de len() para melhor performance
+                ordem = db.session.query(CardKanban).filter_by(lista_id=lista_id).count() + 1
+                
+                card = CardKanban()
+                card.titulo = titulo
+                card.descricao = descricao
+                card.responsavel_id = int(responsavel_id) if responsavel_id and responsavel_id.isdigit() else None
+                card.lista_id = lista_id
+                card.ordem = ordem
+                db.session.add(card)
+                db.session.commit()
+                
+                flash('Tarefa criada com sucesso!', 'success')
+                return redirect(url_for('dailyboard_listas'))
+                
+        except Exception as e:
+            db.session.rollback()
+            flash('Erro ao processar a solicitação!', 'error')
             return redirect(url_for('dailyboard_listas'))
-        # Se for criação de card
-        elif request.form.get('titulo') and request.form.get('lista_id'):
-            titulo = request.form.get('titulo')
-            descricao = request.form.get('descricao')
-            responsavel_id = request.form.get('responsavel_id')
-            lista_id = request.form.get('lista_id')
-            lista = ListaKanban.query.get(lista_id)
-            ordem = len(lista.cards) + 1 if lista else 1
-            card = CardKanban()
-            card.titulo = titulo
-            card.descricao = descricao
-            card.responsavel_id = responsavel_id or None
-            card.lista_id = lista_id
-            card.ordem = ordem
-            db.session.add(card)
-            db.session.commit()
-            return redirect(url_for('dailyboard_listas'))
-    listas = ListaKanban.query.order_by(ListaKanban.ordem).all()
-    usuarios = Usuario.query.all()
+    
+    # Otimização: usar eager loading para evitar N+1 queries
+    listas = ListaKanban.query.options(
+        db.joinedload(ListaKanban.cards)
+    ).order_by(ListaKanban.ordem).all()
+    
+    # Otimização: buscar apenas usuários admin necessários
+    usuarios = Usuario.query.filter_by(tipo='admin').all()
+    
     return render_template('listas_kanban.html', listas=listas, usuarios=usuarios)
 
 @app.route('/dailyboard/listas/<int:lista_id>/editar', methods=['POST'])
@@ -593,17 +639,44 @@ def dailyboard_listas():
 def editar_lista_kanban(lista_id):
     if current_user.tipo != 'admin':
         abort(403)
-    lista = ListaKanban.query.get_or_404(lista_id)
-    if lista.nome.strip().lower() == 'backlog':
-        flash('A coluna Backlog não pode ser editada!')
-        return redirect(url_for('dailyboard_listas'))
-    nome = request.form.get('nome')
-    ordem = request.form.get('ordem')
-    if nome:
+    
+    try:
+        lista = ListaKanban.query.get_or_404(lista_id)
+        
+        # Proteção da coluna Backlog
+        if lista.nome.strip().lower() == 'backlog':
+            flash('A coluna Backlog não pode ser editada!', 'error')
+            return redirect(url_for('dailyboard_listas'))
+        
+        nome = request.form.get('nome', '').strip()
+        ordem = request.form.get('ordem')
+        
+        # Validações
+        if not nome:
+            flash('Nome da coluna é obrigatório!', 'error')
+            return redirect(url_for('dailyboard_listas'))
+        
+        # Verificar se já existe outra coluna com este nome
+        existing = ListaKanban.query.filter(
+            ListaKanban.nome.ilike(nome),
+            ListaKanban.id != lista_id
+        ).first()
+        if existing:
+            flash('Já existe uma coluna com este nome!', 'error')
+            return redirect(url_for('dailyboard_listas'))
+        
+        # Atualizar dados
         lista.nome = nome
-    if ordem:
-        lista.ordem = ordem
-    db.session.commit()
+        if ordem and ordem.isdigit():
+            lista.ordem = int(ordem)
+        
+        db.session.commit()
+        flash('Coluna atualizada com sucesso!', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao atualizar a coluna!', 'error')
+    
     return redirect(url_for('dailyboard_listas'))
 
 @app.route('/dailyboard/listas/<int:lista_id>/excluir', methods=['POST'])
@@ -611,19 +684,38 @@ def editar_lista_kanban(lista_id):
 def excluir_lista_kanban(lista_id):
     if current_user.tipo != 'admin':
         abort(403)
-    lista = ListaKanban.query.get_or_404(lista_id)
-    if lista.nome.strip().lower() == 'backlog':
-        flash('A coluna Backlog não pode ser excluída!')
-        return redirect(url_for('dailyboard_listas'))
-    db.session.delete(lista)
-    db.session.commit()
-    # Log de auditoria
-    log = AuditoriaLog()
-    log.usuario_id = current_user.id
-    log.acao = 'Excluir lista Kanban'
-    log.detalhes = f'Lista excluída: id={lista.id}, nome={lista.nome}'
-    db.session.add(log)
-    db.session.commit()
+    
+    try:
+        lista = ListaKanban.query.get_or_404(lista_id)
+        
+        # Proteção da coluna Backlog
+        if lista.nome.strip().lower() == 'backlog':
+            flash('A coluna Backlog não pode ser excluída!', 'error')
+            return redirect(url_for('dailyboard_listas'))
+        
+        # Verificar se há cards na coluna
+        card_count = db.session.query(CardKanban).filter_by(lista_id=lista_id).count()
+        if card_count > 0:
+            flash(f'Não é possível excluir a coluna "{lista.nome}" pois ela contém {card_count} tarefa(s)!', 'error')
+            return redirect(url_for('dailyboard_listas'))
+        
+        # Log de auditoria antes da exclusão
+        log = AuditoriaLog()
+        log.usuario_id = current_user.id
+        log.acao = 'Excluir lista Kanban'
+        log.detalhes = f'Lista excluída: id={lista.id}, nome={lista.nome}'
+        db.session.add(log)
+        
+        # Excluir a lista
+        db.session.delete(lista)
+        db.session.commit()
+        
+        flash('Coluna excluída com sucesso!', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao excluir a coluna!', 'error')
+    
     return redirect(url_for('dailyboard_listas'))
 
 @app.route('/dailyboard/card/<int:card_id>/finalizar', methods=['POST'])
@@ -653,41 +745,79 @@ def finalizar_card_kanban(card_id):
 def dailyboard_historico():
     if current_user.tipo != 'admin':
         abort(403)
-    responsavel = request.args.get('responsavel')
-    data_ini = request.args.get('data_ini')
-    data_fim = request.args.get('data_fim')
-    excluido = request.args.get('excluido', 'todos')
-    query = CardKanban.query
-    if responsavel and responsavel != 'todos':
-        query = query.filter_by(responsavel_id=responsavel)
-    if excluido == 'ativos':
-        query = query.filter_by(excluido=False)
-    elif excluido == 'excluidos':
-        query = query.filter_by(excluido=True)
-    if data_ini:
-        try:
-            from datetime import datetime
-            from pytz import timezone
-            tz = timezone('America/Sao_Paulo')
-            data_ini_dt = tz.localize(datetime.strptime(data_ini, '%Y-%m-%d'))
-            query = query.filter(CardKanban.id.in_([c.id for c in CardKanban.query.all() if c.comentarios and min([com.data_envio for com in c.comentarios]) >= data_ini_dt]))
-        except:
-            pass
-    if data_fim:
-        try:
-            from datetime import datetime
-            from pytz import timezone
-            tz = timezone('America/Sao_Paulo')
-            data_fim_dt = tz.localize(datetime.strptime(data_fim, '%Y-%m-%d'))
-            query = query.filter(CardKanban.id.in_([c.id for c in CardKanban.query.all() if c.comentarios and min([com.data_envio for com in c.comentarios]) <= data_fim_dt]))
-        except:
-            pass
-    cards = query.all()
-    usuarios = Usuario.query.all()
-    listas = ListaKanban.query.all()
-    return render_template('historico_dailys.html', cards=cards, usuarios=usuarios, listas=listas, filtros={
-        'responsavel': responsavel, 'data_ini': data_ini, 'data_fim': data_fim, 'excluido': excluido
-    })
+    
+    try:
+        responsavel = request.args.get('responsavel')
+        data_ini = request.args.get('data_ini')
+        data_fim = request.args.get('data_fim')
+        excluido = request.args.get('excluido', 'todos')
+        
+        # Otimizar query com eager loading
+        query = CardKanban.query.options(
+            db.joinedload(CardKanban.comentarios),
+            db.joinedload(CardKanban.responsavel)
+        )
+        
+        # Aplicar filtros
+        if responsavel and responsavel != 'todos':
+            query = query.filter_by(responsavel_id=responsavel)
+        
+        if excluido == 'ativos':
+            query = query.filter_by(excluido=False)
+        elif excluido == 'excluidos':
+            query = query.filter_by(excluido=True)
+        
+        # Otimizar filtros de data
+        if data_ini:
+            try:
+                from datetime import datetime
+                from pytz import timezone
+                tz = timezone('America/Sao_Paulo')
+                data_ini_dt = tz.localize(datetime.strptime(data_ini, '%Y-%m-%d'))
+                # Usar subquery mais eficiente
+                subquery = db.session.query(ComentarioKanban.card_id).filter(
+                    ComentarioKanban.data_envio >= data_ini_dt
+                ).group_by(ComentarioKanban.card_id).subquery()
+                query = query.filter(CardKanban.id.in_(subquery))
+            except Exception as e:
+                flash(f'Erro no filtro de data inicial: {str(e)}', 'error')
+        
+        if data_fim:
+            try:
+                from datetime import datetime
+                from pytz import timezone
+                tz = timezone('America/Sao_Paulo')
+                data_fim_dt = tz.localize(datetime.strptime(data_fim, '%Y-%m-%d'))
+                # Usar subquery mais eficiente
+                subquery = db.session.query(ComentarioKanban.card_id).filter(
+                    ComentarioKanban.data_envio <= data_fim_dt
+                ).group_by(ComentarioKanban.card_id).subquery()
+                query = query.filter(CardKanban.id.in_(subquery))
+            except Exception as e:
+                flash(f'Erro no filtro de data final: {str(e)}', 'error')
+        
+        # Ordenar por data de criação (mais recente primeiro)
+        cards = query.order_by(CardKanban.id.desc()).all()
+        
+        # Otimizar queries de usuários e listas
+        usuarios = Usuario.query.all()
+        listas = ListaKanban.query.all()
+        
+        return render_template('historico_dailys.html', 
+                             cards=cards, 
+                             usuarios=usuarios, 
+                             listas=listas, 
+                             filtros={
+                                 'responsavel': responsavel, 
+                                 'data_ini': data_ini, 
+                                 'data_fim': data_fim, 
+                                 'excluido': excluido
+                             })
+    
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Erro ao carregar histórico: {str(e)}', 'error')
+        return redirect(url_for('dailyboard'))
 
 @app.route('/dailyboard/card/<int:card_id>/excluir', methods=['POST'])
 @login_required
@@ -800,5 +930,4 @@ if not os.path.exists('chamados.db'):
             db.session.commit()
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True, host='0.0.0.0', threaded=True)

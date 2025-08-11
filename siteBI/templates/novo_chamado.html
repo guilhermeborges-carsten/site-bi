@@ -1,57 +1,105 @@
 {% extends 'base.html' %}
-{% block title %}Novo Chamado{% endblock %}
+{% block title %}Novo Chamado - Sistema BI{% endblock %}
 {% block content %}
-  <div class="login-container" style="max-width:500px;">
-    <h2>Abrir Novo Chamado</h2>
-    <form method="POST" enctype="multipart/form-data">
-      <label for="titulo">Qual o nome ou a ideia principal do projeto?</label>
-      <input name="titulo" id="titulo" placeholder="Ex: Dashboard de Vendas" required>
+  <div style="max-width: 800px; margin: 0 auto;">
+    <h1>Abrir Novo Chamado</h1>
+    
+    <div class="card">
+      <form method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.5rem;">
+        <div>
+          <label for="titulo">Qual o nome ou a ideia principal do projeto?</label>
+          <input name="titulo" id="titulo" placeholder="Ex: Dashboard de Vendas" required>
+        </div>
 
-      <label for="cargo">Qual é o seu cargo na empresa?</label>
-      <input name="cargo" id="cargo" placeholder="Ex: Analista de BI" required>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label for="cargo">Qual é o seu cargo na empresa?</label>
+            <input name="cargo" id="cargo" placeholder="Ex: Analista de BI" required>
+          </div>
+          <div>
+            <label for="setor">A qual setor você pertence?</label>
+            <input name="setor" id="setor" placeholder="Ex: Comercial" required>
+          </div>
+        </div>
 
-      <label for="setor">A qual setor você pertence?</label>
-      <input name="setor" id="setor" placeholder="Ex: Comercial" required>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label for="urgencia">Qual o nível de urgência?</label>
+            <select name="urgencia" id="urgencia" required>
+              <option value="">Selecione...</option>
+              <option value="Baixa">Baixa</option>
+              <option value="Média">Média</option>
+              <option value="Alta">Alta</option>
+              <option value="Crítica">Crítica</option>
+            </select>
+          </div>
+          <div>
+            <label for="segmentacao">Este projeto se enquadra em qual segmentação?</label>
+            <select name="segmentacao" id="segmentacao" required>
+              <option value="">Selecione...</option>
+              <option value="Atualização">Atualização</option>
+              <option value="Correção">Correção</option>
+              <option value="Desenvolvimento">Desenvolvimento</option>
+            </select>
+          </div>
+        </div>
 
-      <label for="urgencia">Qual o nível de urgência?</label>
-      <select name="urgencia" id="urgencia" required style="margin-bottom:10px;">
-        <option value="">Selecione...</option>
-        <option value="Baixa">Baixa</option>
-        <option value="Média">Média</option>
-        <option value="Alta">Alta</option>
-        <option value="Crítica">Crítica</option>
-      </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+          <div>
+            <label for="tipo_projeto">Como você classificaria o tipo de projeto?</label>
+            <select name="tipo_projeto" id="tipo_projeto" required>
+              <option value="">Selecione...</option>
+              <option value="Operacional">Operacional (Tarefas do dia a dia)</option>
+              <option value="Tático">Tático (Suporte a áreas e processos)</option>
+              <option value="Estratégico">Estratégico (Apoio à estratégia do negócio)</option>
+            </select>
+          </div>
+          <div>
+            <label for="objetivo">Qual é o principal objetivo da solicitação?</label>
+            <select name="objetivo" id="objetivo" required>
+              <option value="">Selecione...</option>
+              <option value="Análise de Dados">Análise de Dados</option>
+              <option value="Aumento de Produtividade e Receita">Aumento de Produtividade e Receita</option>
+              <option value="Redução de Custo">Redução de Custo</option>
+            </select>
+          </div>
+        </div>
 
-      <label for="segmentacao">Este projeto se enquadra em qual segmentação?</label>
-      <select name="segmentacao" id="segmentacao" required style="margin-bottom:10px;">
-        <option value="">Selecione...</option>
-        <option value="Atualização">Atualização</option>
-        <option value="Correção">Correção</option>
-        <option value="Desenvolvimento">Desenvolvimento</option>
-      </select>
+        <div>
+          <label for="descricao">Quais recursos ou informações você pode fornecer para apoiar o desenvolvimento deste projeto?</label>
+          <textarea name="descricao" id="descricao" placeholder="Descreva recursos, dados, sistemas envolvidos, etc." rows="6" required></textarea>
+        </div>
 
-      <label for="tipo_projeto">Como você classificaria o tipo de projeto?</label>
-      <select name="tipo_projeto" id="tipo_projeto" required style="margin-bottom:10px;">
-        <option value="">Selecione...</option>
-        <option value="Operacional">Operacional (Tarefas do dia a dia)</option>
-        <option value="Tático">Tático (Suporte a áreas e processos)</option>
-        <option value="Estratégico">Estratégico (Apoio à estratégia do negócio)</option>
-      </select>
+        <div>
+          <label for="anexo">
+            <i class="fas fa-paperclip"></i>
+            Anexar arquivo (opcional)
+          </label>
+          <input type="file" name="anexo" id="anexo" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.txt,.csv" style="padding: 0.75rem;">
+          <small style="color: #718096; font-size: 0.85rem; margin-top: 0.5rem; display: block;">
+            Formatos aceitos: PDF, PNG, JPG, DOC, DOCX, XLS, XLSX, TXT, CSV
+          </small>
+        </div>
 
-      <label for="objetivo">Qual é o principal objetivo da solicitação?</label>
-      <select name="objetivo" id="objetivo" required style="margin-bottom:10px;">
-        <option value="">Selecione...</option>
-        <option value="Análise de Dados">Análise de Dados</option>
-        <option value="Aumento de Produtividade e Receita">Aumento de Produtividade e Receita</option>
-        <option value="Redução de Custo">Redução de Custo</option>
-      </select>
-
-      <label for="descricao">Quais recursos ou informações você pode fornecer para apoiar o desenvolvimento deste projeto?</label>
-      <textarea name="descricao" id="descricao" placeholder="Descreva recursos, dados, sistemas envolvidos, etc." required></textarea>
-
-      <label for="anexo">Anexar arquivo (opcional)</label>
-      <input type="file" name="anexo" id="anexo" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.txt,.csv">
-      <button type="submit" class="btn btn-success" style="width:100%; margin-top:16px;"><i class="fa fa-paper-plane"></i> Enviar</button>
-    </form>
+        <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+          <button type="submit" class="btn btn-success" style="flex: 1;">
+            <i class="fas fa-paper-plane"></i>
+            Enviar Chamado
+          </button>
+          <a href="{{ url_for('dashboard') }}" class="btn" style="flex: 0 0 auto;">
+            <i class="fas fa-times"></i>
+            Cancelar
+          </a>
+        </div>
+      </form>
+    </div>
   </div>
+
+  <style>
+    @media (max-width: 768px) {
+      .card form > div[style*="grid"] {
+        grid-template-columns: 1fr !important;
+      }
+    }
+  </style>
 {% endblock %}

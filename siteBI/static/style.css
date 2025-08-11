@@ -1,374 +1,1701 @@
-body {
+/* Reset e configurações básicas */
+* {
   margin: 0;
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  background: #f4f6fa;
-  color: #222;
+  padding: 0;
+  box-sizing: border-box;
 }
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #2d3748;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+/* Sidebar moderna */
 .sidebar {
-  background: #003d73;
-  width: 220px;
+  width: 280px;
+  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+  color: white;
   height: 100vh;
   position: fixed;
-  padding: 40px 0 0 0;
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.04);
+  padding: 0;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  overflow-y: auto;
 }
-.sidebar-title {
+
+.sidebar h2 {
+  margin: 0;
+  padding: 30px 20px 20px;
   text-align: center;
-  margin-bottom: 40px;
-  color: #ffd700;
-  font-size: 1.7em;
-  letter-spacing: 1.5px;
+  font-size: 1.8rem;
   font-weight: 600;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
+
 .sidebar ul {
   list-style: none;
-  padding: 0;
-  width: 100%;
+  padding: 20px 0;
 }
+
 .sidebar ul li {
   margin: 0;
-  width: 100%;
 }
+
 .sidebar ul li a {
-  color: #fff;
+  color: #ecf0f1;
   text-decoration: none;
-  font-weight: 500;
   display: flex;
   align-items: center;
-  font-size: 1.13em;
-  padding: 16px 36px;
-  transition: background 0.18s, color 0.18s;
-  border-left: 4px solid transparent;
-  gap: 14px;
-}
-.sidebar ul li a:hover, .sidebar ul li a.active {
-  background: #0056a6;
-  color: #ffd700;
-  border-left: 4px solid #ffd700;
-}
-.sidebar ul li a i {
-  font-size: 1.25em;
-  margin-right: 10px;
-}
-.sidebar-logo {
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  padding-bottom: 24px;
-  background: none;
-  margin-bottom: 0;
-}
-.sidebar-logo img {
-  height: 54px;
-  margin: 0 auto;
-  display: block;
-}
-.main {
-  margin-left: 220px;
-  padding: 48px 24px 0 24px;
-  min-height: 100vh;
-  background: #f4f6fa;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-}
-.login-container, .card, .kanban-list, .footer-logo {
-  background: #fff;
+  padding: 15px 25px;
+  margin: 5px 15px;
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  padding: 36px;
-  margin-bottom: 36px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  gap: 12px;
 }
-.footer-logo {
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  width: calc(100% - 220px);
-  margin-left: 220px;
-  background: none;
-  box-shadow: none;
-  padding: 0;
+
+.sidebar ul li a i {
+  width: 20px;
   text-align: center;
-  z-index: 100;
+  font-size: 1.1rem;
 }
-.footer-logo img {
-  height: 48px;
-  margin: 16px auto 8px auto;
-  display: inline-block;
-}
-.sidebar-logo {
+
+.sidebar ul li a::before {
+  content: '';
   position: absolute;
   left: 0;
-  bottom: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+  z-index: -1;
+}
+
+.sidebar ul li a:hover::before {
   width: 100%;
-  text-align: center;
-  padding-bottom: 16px;
-  background: none;
 }
-.sidebar-logo {
-  margin-bottom: 60px; /* Aumente para subir a logo */
-  width: 80%;
-  align-self: center;
+
+.sidebar ul li a:hover {
+  color: white;
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
-input, textarea, select, button {
-  display: block;
-  width: 100%;
-  margin: 12px 0 24px 0;
-  padding: 14px;
-  border-radius: 8px;
-  border: 1px solid #bfc9d1;
-  font-size: 1.08em;
-  background: #f7fafc;
-  transition: border 0.2s, box-shadow 0.2s;
+
+/* Main content */
+.main-content {
+  margin-left: 280px;
+  padding: 30px;
+  min-height: 100vh;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
 }
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #0056a6;
-  background: #fff;
-  box-shadow: 0 0 0 2px #0056a633;
+
+/* Card header e body */
+.card-header {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 1px solid #dee2e6;
+  padding: 20px 25px;
+  border-radius: 12px 12px 0 0;
 }
-label {
+
+.card-header h2, .card-header h3 {
+  margin: 0;
+  color: #2d3748;
   font-weight: 600;
-  color: #003d73;
-  margin-bottom: 4px;
-  font-size: 1.04em;
-}
-button, .btn {
-  background: #0056a6;
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 13px 32px;
-  font-size: 1.08em;
-  font-weight: 600;
-  cursor: pointer;
-  margin: 8px 0 8px 8px;
-  transition: background 0.18s, box-shadow 0.18s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-button:hover, .btn:hover {
-  background: #003d73;
-}
-.btn-danger, .btn-excluir {
-  background: #dc3545;
-  color: #fff;
-}
-.btn-danger:hover, .btn-excluir:hover {
-  background: #a71d2a;
-}
-.btn-success {
-  background: #218838;
-  color: #fff;
-}
-.btn-success:hover {
-  background: #17632a;
-}
-.flash {
-  color: #fff;
-  background: #dc3545;
-  padding: 12px 24px;
-  border-radius: 8px;
-  margin: 18px 0;
-  font-weight: 600;
-  box-shadow: 0 2px 8px rgba(220,53,69,0.08);
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: 1.08em;
 }
-.flash.success {
-  background: #218838;
+
+.card-header h2 i, .card-header h3 i {
+  color: #667eea;
 }
-.flash.info {
-  background: #0056a6;
+
+.card-header p {
+  margin: 8px 0 0 0;
+  color: #6c757d;
+  font-size: 0.95rem;
 }
-/* Cards e filtros estilo dashboard moderno */
-.card-metric {
-  display: inline-block;
-  min-width: 180px;
-  background: #0056a6;
-  color: #fff;
-  border-radius: 8px;
-  padding: 18px 24px;
-  margin: 0 16px 24px 0;
-  font-size: 1.2em;
-  text-align: center;
-  font-weight: bold;
+
+.card-body {
+  padding: 25px;
 }
-.card-metric.green { background: #218838; }
-.card-metric.yellow { background: #ffc107; color: #222; }
-.card-metric.red { background: #dc3545; }
-.filtros-box {
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  padding: 18px 24px;
-  margin-bottom: 32px;
+
+/* Formulários inline e responsivos */
+.form-inline {
   display: flex;
+  gap: 15px;
+  align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
-  align-items: end;
-  max-width: 1100px;
-  width: 100%;
-}
-.filtros-box label {
-  font-weight: bold;
-  color: #0056a6;
-}
-.filtros-box input, .filtros-box select {
-  width: 180px;
-  margin: 0;
-}
-.filtros-box button {
-  width: auto;
-  margin: 0;
-  padding: 10px 24px;
-}
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  max-width: 1100px;
-}
-.table th, .table td {
-  padding: 18px 24px;
-  text-align: left;
-  font-size: 1.08em;
-}
-.table th {
-  background: #0056a6;
-  color: #fff;
-  font-weight: 700;
-}
-.table tr {
-  height: 56px;
-}
-.table tbody tr {
-  border-bottom: 8px solid #f8f9fa;
-}
-.table tr:nth-child(even) {
-  background: #f4f4f4;
-}
-.table tr:hover {
-  background: #e9ecef;
 }
 
-/* Centralizar containers internos */
-.login-container, .card, .kanban-list {
-  margin-left: auto;
-  margin-right: auto;
-}
-
-/* Ajustar largura máxima para melhor centralização visual */
-.login-container, .card, .kanban-list {
-  max-width: 600px;
-  width: 100%;
-}
-
-/* Centralizar rodapé */
-.footer-logo {
-  left: 0;
-  bottom: 0;
-  width: calc(100% - 220px);
-  margin-left: 220px;
-  background: none;
-  box-shadow: none;
-  padding: 0;
-  text-align: center;
-  z-index: 100;
-}
-
-/* Centralizar títulos */
-h1, h2, h3 {
-  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-  font-weight: 600;
-  color: #003d73;
-  margin-top: 0;
-  margin-bottom: 18px;
-}
-
-/* Responsividade básica */
-@media (max-width: 900px) {
-  .main {
-    margin-left: 0;
-    padding: 24px 4vw 0 4vw;
-  }
-  .sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 12px 0 0 0;
-    box-shadow: none;
-  }
-  .sidebar ul {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 8px;
-  }
-  .sidebar ul li a {
-    padding: 10px 12px;
-    font-size: 1em;
-  }
-  .sidebar-logo {
-    position: static;
-    margin-bottom: 0;
-    padding-bottom: 0;
-  }
-  .footer-logo {
-    width: 100%;
-    margin-left: 0;
-  }
-}
-@media (max-width: 600px) {
-  .login-container, .card, .kanban-list, .filtros-box, .table {
-    padding: 12px;
-    border-radius: 8px;
-  }
-  .sidebar ul li a {
-    padding: 8px 6px;
-    font-size: 0.98em;
-  }
-  .footer-logo img {
-    height: 36px;
-  }
-}
-
-/* Alinhamento do formulário de busca por protocolo */
-form[method="get"] {
+.form-row {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.inline-form {
+  display: inline;
+}
+
+.task-form {
+  margin: 0;
+}
+
+/* Botões pequenos */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  border-radius: 6px;
+}
+
+/* Grupos de botões */
+.btn-group {
+  display: flex;
+  gap: 5px;
   align-items: center;
 }
-form[method="get"] input[type="text"],
-form[method="get"] button {
-  height: 42px;
-  box-sizing: border-box;
+
+/* Tabela responsiva */
+.table-responsive {
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-form[method="get"] input[type="text"] {
+
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 15px 12px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table th i {
+  margin-right: 5px;
+}
+
+.table td {
+  padding: 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table tbody tr:hover {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Estado vazio */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.empty-state i {
+  margin-bottom: 15px;
+  opacity: 0.6;
+}
+
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+/* Utilitários */
+.text-center {
+  text-align: center;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+/* Auth content para login/cadastro */
+.auth-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Cards modernos */
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  margin-bottom: 25px;
+  border: 1px solid rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* Forms modernos */
+form {
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Exceções para formulários inline e pequenos */
+form.inline-form,
+form.task-form,
+form[style*="display: inline"],
+form[style*="margin: 0"] {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+}
+
+/* Garantir que formulários dentro de tabelas não tenham fundo branco */
+table form.inline-form,
+table form.task-form,
+table .btn-group form,
+table form[style*="display: inline"],
+table form[style*="margin: 0"] {
+  background: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* Garantir que botões de exclusão não tenham fundo branco */
+.btn-danger,
+.btn-danger:hover {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #9b2c2c) !important;
+}
+
+/* Garantir que botões dentro de tabelas não herdem fundo branco */
+table .btn,
+table form .btn {
+  background: linear-gradient(45deg, #667eea, #764ba2) !important;
+}
+
+table .btn-danger,
+table form .btn-danger {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+}
+
+table .btn-danger:hover,
+table form .btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #9b2c2c) !important;
+}
+
+/* Garantir que botões dentro de cards não herdem fundo branco */
+.card .btn,
+.card form .btn {
+  background: linear-gradient(45deg, #667eea, #764ba2) !important;
+}
+
+.card .btn-danger,
+.card form .btn-danger {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+}
+
+.card .btn-danger:hover,
+.card form .btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #9b2c2c) !important;
+}
+
+/* Garantir que botões pequenos não herdem fundo branco */
+.btn-sm.btn-danger,
+.btn-sm.btn-danger:hover {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+}
+
+.btn-sm.btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #9b2c2c) !important;
+}
+
+/* Garantir que botões pequenos dentro de grupos de botões não herdem fundo branco */
+.btn-group .btn-sm.btn-danger,
+.btn-group .btn-sm.btn-danger:hover {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+}
+
+.btn-group .btn-sm.btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #9b2c2c) !important;
+}
+
+/* Garantir que todos os botões pequenos não herdem fundo branco */
+.btn-sm,
+.btn-sm:hover {
+  background: linear-gradient(45deg, #667eea, #764ba2) !important;
+}
+
+.btn-sm:hover {
+  background: linear-gradient(45deg, #5a67d8, #6b46c1) !important;
+}
+
+/* Regra final para garantir que TODOS os botões de exclusão tenham fundo vermelho */
+button.btn-danger,
+button.btn-danger:hover,
+.btn-danger,
+.btn-danger:hover,
+[class*="btn-danger"],
+[class*="btn-danger"]:hover {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+}
+
+button.btn-danger:hover,
+.btn-danger:hover,
+[class*="btn-danger"]:hover {
+  background: linear-gradient(45deg, #c53030, #9b2c2c) !important;
+}
+
+/* REMOVER COMPLETAMENTE QUALQUER FUNDO BRANCO DE FORMULÁRIOS */
+form.inline-form,
+form.task-form,
+form[style*="display: inline"],
+form[style*="margin: 0"],
+table form,
+table form.inline-form,
+table form.task-form,
+table .btn-group form,
+table form[style*="display: inline"],
+table form[style*="margin: 0"],
+.card form,
+.card form.inline-form,
+.card form.task-form,
+.card .btn-group form,
+.card form[style*="display: inline"],
+.card form[style*="margin: 0"] {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+/* REGRA ULTRA ESPECÍFICA PARA FORMULÁRIOS INLINE */
+form.inline-form {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+  display: inline !important;
+}
+
+/* REGRA ESPECÍFICA PARA FORMULÁRIOS DENTRO DE TABELAS */
+table form.inline-form {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+  display: inline !important;
+}
+
+/* REGRA ESPECÍFICA PARA FORMULÁRIOS DENTRO DE CARDS */
+.card form.inline-form {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+  display: inline !important;
+}
+
+/* GARANTIR QUE BOTÕES NÃO TENHAM FUNDO BRANCO EM NENHUM CONTEXTO */
+.btn,
+.btn-sm,
+.btn-danger,
+.btn-danger.btn-sm,
+button.btn,
+button.btn-sm,
+button.btn-danger,
+button.btn-danger.btn-sm {
+  background: linear-gradient(45deg, #667eea, #764ba2) !important;
+  background-color: transparent !important;
+}
+
+.btn-danger,
+.btn-danger.btn-sm,
+button.btn-danger,
+button.btn-danger.btn-sm {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+  background-color: transparent !important;
+}
+
+.btn-danger:hover,
+.btn-danger.btn-sm:hover,
+button.btn-danger:hover,
+button.btn-danger.btn-sm:hover {
+  background: linear-gradient(45deg, #c53030, #9b2c2c) !important;
+  background-color: transparent !important;
+}
+
+/* REGRA ULTRA ESPECÍFICA PARA REMOVER QUALQUER FUNDO BRANCO */
+* {
+  background-color: transparent !important;
+}
+
+.card,
+.card-header,
+.card-body,
+.table,
+.table th,
+.table td,
+.table tbody tr {
+  background-color: transparent !important;
+}
+
+/* RESTAURAR FUNDOS NECESSÁRIOS */
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+.main-content {
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.card {
+  background: white !important;
+}
+
+.table {
+  background: white !important;
+}
+
+.table th {
+  background: #f8f9fa !important;
+}
+
+/* GARANTIR QUE FORM-CONTROL-SM TENHA FUNDO BRANCO */
+.form-control-sm {
+  background: #f8fafc !important;
+  background-color: #f8fafc !important;
+}
+
+/* GARANTIR QUE BOTÕES MANTENHAM SEUS GRADIENTES */
+form:not(.main-form) .btn,
+form:not(.main-form) button {
+  background: linear-gradient(45deg, #667eea, #764ba2) !important;
+  background-color: transparent !important;
+}
+
+form:not(.main-form) .btn-danger,
+form:not(.main-form) button.btn-danger {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+  background-color: transparent !important;
+}
+
+form:not(.main-form) .btn-danger:hover,
+form:not(.main-form) button.btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #a52a2a) !important;
+}
+
+/* REGRA ESPECÍFICA PARA BTN-GROUP - SEMPRE TRANSPARENTE */
+.btn-group {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  gap: 5px !important;
+}
+
+/* GARANTIR QUE BTN-GROUP DENTRO DE FORMULÁRIOS SEJA TRANSPARENTE */
+form .btn-group,
+form.inline-form .btn-group,
+form.task-form .btn-group,
+table form .btn-group,
+table form.inline-form .btn-group,
+table form.task-form .btn-group,
+table td form .btn-group,
+table td form.inline-form .btn-group,
+table td form.task-form .btn-group {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  gap: 5px !important;
+}
+
+/* GARANTIR QUE TODOS OS ELEMENTOS DENTRO DE BTN-GROUP SEJAM TRANSPARENTES */
+.btn-group *:not(.btn):not(button),
+form .btn-group *:not(.btn):not(button),
+form.inline-form .btn-group *:not(.btn):not(button),
+form.task-form .btn-group *:not(.btn):not(button),
+table form .btn-group *:not(.btn):not(button),
+table form.inline-form .btn-group *:not(.btn):not(button),
+table form.task-form .btn-group *:not(.btn):not(button),
+table td form .btn-group *:not(.btn):not(button),
+table td form.inline-form .btn-group *:not(.btn):not(button),
+table td form.task-form .btn-group *:not(.btn):not(button) {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.form-control-sm:focus {
+  outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Estados de validação */
+.form-control-sm.valid {
+  border-color: #48bb78;
+  background: #f0fff4;
+}
+
+.form-control-sm.invalid {
+  border-color: #e53e3e;
+  background: #fff5f5;
+}
+
+/* Botões desabilitados */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Spinner para loading */
+.fa-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Flash messages com fade out */
+.flash {
+  transition: opacity 0.3s ease;
+}
+
+.flash.fade-out {
+  opacity: 0;
+}
+
+/* Tabela com scroll otimizado */
+.table-responsive {
+  scrollbar-width: thin;
+  scrollbar-color: #667eea #f1f1f1;
+}
+
+.table-responsive::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  border-radius: 3px;
+}
+
+/* Otimizações de performance para formulários */
+.form-inline .form-group {
+  margin-bottom: 0;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 0;
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* GARANTIR QUE FORM-ROW TAMBÉM SEJA TRANSPARENTE */
+.form-row {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+/* GARANTIR QUE FORM-GROUP TAMBÉM SEJA TRANSPARENTE */
+.form-group {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin-bottom: 20px;
+}
+
+/* GARANTIR QUE BOTÕES DENTRO DE FORM-ROW E FORM-GROUP MANTENHAM SEUS GRADIENTES */
+.form-row .btn,
+.form-group .btn,
+.form-row button,
+.form-group button {
+  background: linear-gradient(45deg, #667eea, #764ba2) !important;
+  background-color: transparent !important;
+  color: white !important;
+  padding: 15px 30px !important;
+  border: none !important;
+  border-radius: 12px !important;
+  cursor: pointer !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  text-align: center !important;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+}
+
+.form-row .btn-danger,
+.form-group .btn-danger,
+.form-row button.btn-danger,
+.form-group button.btn-danger {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+  background-color: transparent !important;
+}
+
+.form-row .btn-danger:hover,
+.form-group .btn-danger:hover,
+.form-row button.btn-danger:hover,
+.form-group button.btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #a52a2a) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(229, 62, 62, 0.4) !important;
+}
+
+/* BOTÕES PEQUENOS DENTRO DE FORM-ROW E FORM-GROUP */
+.form-row .btn-sm,
+.form-group .btn-sm,
+.form-row button.btn-sm,
+.form-group button.btn-sm {
+  padding: 6px 12px !important;
+  font-size: 0.875rem !important;
+  border-radius: 6px !important;
+}
+
+.form-row .btn-sm.btn-danger,
+.form-group .btn-sm.btn-danger,
+.form-row button.btn-sm.btn-danger,
+.form-group button.btn-sm.btn-danger {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+  background-color: transparent !important;
+}
+
+.form-row .btn-sm.btn-danger:hover,
+.form-group .btn-sm.btn-danger:hover,
+.form-row button.btn-sm.btn-danger:hover,
+.form-group button.btn-sm.btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #a52a2a) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4) !important;
+}
+
+/* Prevenção de layout shift */
+.table td {
+  min-width: 100px;
+}
+
+.table td:last-child {
+  min-width: 200px;
+}
+
+/* Otimizações para telas pequenas */
+@media (max-width: 768px) {
+  .form-control-sm {
+    font-size: 0.8rem;
+    padding: 6px 10px;
+  }
+  
+  .btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.85rem;
+  }
+  
+  .table th, .table td {
+    padding: 8px 6px;
+  }
+}
+
+/* Styles for historico_dailys.html */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-ativo {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+}
+
+.status-excluido {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  color: white;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25em 0.6em;
+  font-size: 0.75em;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.375rem;
+}
+
+.badge-primary {
+  background: linear-gradient(135deg, #3182ce, #2c5aa0);
+  color: white;
+}
+
+.badge-info {
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+  color: white;
+}
+
+.badge-secondary {
+  background: linear-gradient(135deg, #718096, #4a5568);
+  color: white;
+}
+
+.badge-success {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+  color: white;
+}
+
+.badge-danger {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  color: white;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-muted {
+  color: #718096 !important;
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+.mt-4 {
+  margin-top: 1.5rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -0.75rem;
+  margin-left: -0.75rem;
+}
+
+.col-md-3 {
+  flex: 0 0 25%;
+  max-width: 25%;
+  padding-right: 0.75rem;
+  padding-left: 0.75rem;
+}
+
+.bg-primary {
+  background: linear-gradient(135deg, #3182ce, #2c5aa0) !important;
+}
+
+.bg-success {
+  background: linear-gradient(135deg, #48bb78, #38a169) !important;
+}
+
+.bg-danger {
+  background: linear-gradient(135deg, #e53e3e, #c53030) !important;
+}
+
+.bg-info {
+  background: linear-gradient(135deg, #4299e1, #3182ce) !important;
+}
+
+.text-white {
+  color: white !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.table-danger {
+  background-color: rgba(229, 62, 62, 0.1);
+}
+
+.table-danger:hover {
+  background-color: rgba(229, 62, 62, 0.15);
+}
+
+/* Responsive adjustments for historico */
+@media (max-width: 768px) {
+  .col-md-3 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    margin-bottom: 1rem;
+  }
+  
+  .status-badge {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
+  
+  .badge {
+    font-size: 0.7em;
+    padding: 0.2em 0.5em;
+  }
+  
+  .text-truncate {
+    max-width: 150px !important;
+  }
+}
+
+/* REGRA FINAL ULTRA-ESPECÍFICA PARA ELIMINAR QUALQUER FUNDO BRANCO */
+/* GARANTIR QUE TODOS OS ELEMENTOS DENTRO DE FORMULÁRIOS DE EXCLUSÃO SEJAM TRANSPARENTES */
+form[onsubmit*="confirm"],
+form[onsubmit*="confirm"] *,
+form.inline-form[onsubmit*="confirm"],
+form.inline-form[onsubmit*="confirm"] *,
+table form[onsubmit*="confirm"],
+table form[onsubmit*="confirm"] *,
+table td form[onsubmit*="confirm"],
+table td form[onsubmit*="confirm"] *,
+.btn-group form[onsubmit*="confirm"],
+.btn-group form[onsubmit*="confirm"] * {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* EXCEÇÃO APENAS PARA O BOTÃO DE EXCLUSÃO DENTRO DO FORMULÁRIO */
+form[onsubmit*="confirm"] .btn-danger,
+form[onsubmit*="confirm"] button.btn-danger,
+form.inline-form[onsubmit*="confirm"] .btn-danger,
+form.inline-form[onsubmit*="confirm"] button.btn-danger,
+table form[onsubmit*="confirm"] .btn-danger,
+table form[onsubmit*="confirm"] button.btn-danger,
+table td form[onsubmit*="confirm"] .btn-danger,
+table td form[onsubmit*="confirm"] button.btn-danger,
+.btn-group form[onsubmit*="confirm"] .btn-danger,
+.btn-group form[onsubmit*="confirm"] button.btn-danger {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+  background-color: transparent !important;
+  color: white !important;
+  padding: 6px 12px !important;
+  border: none !important;
+  border-radius: 6px !important;
+  cursor: pointer !important;
+  font-size: 0.875rem !important;
+  font-weight: 600 !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  text-align: center !important;
+  box-shadow: 0 2px 8px rgba(229, 62, 62, 0.3) !important;
+}
+
+form[onsubmit*="confirm"] .btn-danger:hover,
+form[onsubmit*="confirm"] button.btn-danger:hover,
+form.inline-form[onsubmit*="confirm"] .btn-danger:hover,
+form.inline-form[onsubmit*="confirm"] button.btn-danger:hover,
+table form[onsubmit*="confirm"] .btn-danger:hover,
+table form[onsubmit*="confirm"] button.btn-danger:hover,
+table td form[onsubmit*="confirm"] .btn-danger:hover,
+table td form[onsubmit*="confirm"] button.btn-danger:hover,
+.btn-group form[onsubmit*="confirm"] .btn-danger:hover,
+.btn-group form[onsubmit*="confirm"] button.btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #a52a2a) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 15px rgba(229, 62, 62, 0.4) !important;
+}
+
+/* REGRA PARA GARANTIR QUE BTN-GROUP DENTRO DE FORMULÁRIOS DE EXCLUSÃO SEJA TRANSPARENTE */
+form[onsubmit*="confirm"] .btn-group,
+form.inline-form[onsubmit*="confirm"] .btn-group,
+table form[onsubmit*="confirm"] .btn-group,
+table td form[onsubmit*="confirm"] .btn-group {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+  display: inline-flex !important;
+  gap: 5px !important;
+}
+
+/* REGRA PARA GARANTIR QUE TODOS OS ELEMENTOS DENTRO DE BTN-GROUP EM FORMULÁRIOS DE EXCLUSÃO SEJAM TRANSPARENTES */
+form[onsubmit*="confirm"] .btn-group *:not(.btn):not(button),
+form.inline-form[onsubmit*="confirm"] .btn-group *:not(.btn):not(button),
+table form[onsubmit*="confirm"] .btn-group *:not(.btn):not(button),
+table td form[onsubmit*="confirm"] .btn-group *:not(.btn):not(button) {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* REGRA ABSOLUTA FINAL - ELIMINAR QUALQUER POSSÍVEL FUNDO BRANCO EM QUALQUER CONTEXTO */
+/* FORÇAR TRANSPARÊNCIA EM TODOS OS ELEMENTOS QUE PODEM TER FUNDO BRANCO */
+*:not(body):not(.main-content):not(.card):not(.table):not(.table th):not(.form-control-sm):not(.btn):not(button):not(input):not(select):not(textarea) {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* GARANTIR QUE FORMULÁRIOS NÃO TENHAM FUNDO BRANCO */
+form:not(.main-form) {
+  background: transparent !important;
+  background-color: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 0 !important;
+}
+
+/* GARANTIR QUE ELEMENTOS DENTRO DE FORMULÁRIOS SEJAM TRANSPARENTES */
+form:not(.main-form) *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm) {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* GARANTIR QUE BOTÕES MANTENHAM SEUS GRADIENTES */
+form:not(.main-form) .btn,
+form:not(.main-form) button {
+  background: linear-gradient(45deg, #667eea, #764ba2) !important;
+  background-color: transparent !important;
+}
+
+form:not(.main-form) .btn-danger,
+form:not(.main-form) button.btn-danger {
+  background: linear-gradient(45deg, #e53e3e, #c53030) !important;
+  background-color: transparent !important;
+}
+
+form:not(.main-form) .btn-danger:hover,
+form:not(.main-form) button.btn-danger:hover {
+  background: linear-gradient(45deg, #c53030, #a52a2a) !important;
+}
+
+/* REGRA ESPECÍFICA PARA ELIMINAR FUNDO BRANCO EM QUALQUER CONTEXTO DE FORMULÁRIO */
+div form,
+span form,
+td form,
+th form,
+.btn-group form,
+form div,
+form span,
+form td,
+form th,
+form .btn-group {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* GARANTIR QUE ELEMENTOS DENTRO DE QUALQUER CONTEXTO DE FORMULÁRIO SEJAM TRANSPARENTES */
+div form *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+span form *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+td form *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+th form *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+.btn-group form *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+form div *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+form span *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+form td *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+form th *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm),
+form .btn-group *:not(.btn):not(button):not(input):not(select):not(textarea):not(.form-control):not(.form-control-sm) {
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+}
+
+/* ESTILOS ESPECÍFICOS PARA A PÁGINA DE ESTATÍSTICAS */
+
+/* Grid de gráficos */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 30px;
+  margin-bottom: 40px;
+}
+
+.chart-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.chart-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.chart-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 25px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.chart-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chart-header h3 i {
+  font-size: 1rem;
+  opacity: 0.9;
+}
+
+.chart-container {
+  padding: 25px;
+  height: 300px;
+  position: relative;
+}
+
+/* Seção de tabelas */
+.tables-section {
+  margin-top: 40px;
+}
+
+.tables-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+.table-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.table-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.table-card h4 {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  color: #2d3748;
+  margin: 0;
+  padding: 15px 20px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.table-card h4 i {
+  color: #667eea;
+  font-size: 0.9rem;
+}
+
+.table-card .table-responsive {
+  padding: 0;
+}
+
+.table-card .table {
+  margin: 0;
+  border: none;
+}
+
+.table-card .table th {
+  background: #f8fafc;
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 20px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.table-card .table td {
+  padding: 12px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9rem;
+  color: #2d3748;
+}
+
+.table-card .table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.table-card .table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Badges para as tabelas */
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 6px;
+  color: white;
+}
+
+.badge-primary {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+.badge-info {
+  background: linear-gradient(135deg, #4299e1, #3182ce);
+}
+
+.badge-danger {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+}
+
+.badge-warning {
+  background: linear-gradient(135deg, #ed8936, #dd6b20);
+}
+
+.badge-success {
+  background: linear-gradient(135deg, #48bb78, #38a169);
+}
+
+/* Responsividade para estatísticas */
+@media (max-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+  }
+  
+  .tables-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  
+
+}
+
+@media (max-width: 768px) {
+  
+  .charts-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .chart-container {
+    height: 250px;
+    padding: 20px;
+  }
+  
+  .tables-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .chart-header {
+    padding: 15px 20px;
+  }
+  
+  .chart-header h3 {
+    font-size: 1rem;
+  }
+  
+  .table-card h4 {
+    padding: 12px 15px;
+    font-size: 0.9rem;
+  }
+  
+  .table-card .table th,
+  .table-card .table td {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .metric-card {
+    padding: 15px;
+  }
+  
+  .metric-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .metric-value {
+    font-size: 1.3rem;
+  }
+  
+  .metric-content h3 {
+    font-size: 0.75rem;
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .chart-actions {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  
+  .chart-container {
+    height: 200px;
+    padding: 15px;
+  }
+  
+  .chart-header {
+    padding: 12px 15px;
+  }
+  
+  .chart-header h3 {
+    font-size: 0.9rem;
+  }
+  
+  .table-card .table th,
+  .table-card .table td {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+  
+  .badge {
+    font-size: 0.7rem;
+    padding: 3px 6px;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .metric-card {
+    padding: 15px;
+  }
+  
+  .metric-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .metric-value {
+    font-size: 1.3rem;
+  }
+  
+  .chart-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+}
+
+/* CARDS DE MÉTRICAS PRINCIPAIS */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.metric-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.metric-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.metric-card:nth-child(1)::before {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.metric-card:nth-child(2)::before {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.metric-card:nth-child(3)::before {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.metric-card:nth-child(4)::before {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+}
+
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.metric-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  flex-shrink: 0;
+}
+
+.metric-card:nth-child(1) .metric-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.metric-card:nth-child(2) .metric-icon {
+  background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+}
+
+.metric-card:nth-child(3) .metric-icon {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.metric-card:nth-child(4) .metric-icon {
+  background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+}
+
+.metric-content {
   flex: 1;
   min-width: 0;
 }
-form[method="get"] button {
-  white-space: nowrap;
-  margin: 0;
-  width: auto !important;
-  min-width: 100px;
-  max-width: 180px;
+
+.metric-content h3 {
+  margin: 0 0 6px 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #718096;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 6px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s ease;
+}
+
+.metric-trend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 6px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.metric-trend.positive {
+  background: rgba(72, 187, 120, 0.1);
+  color: #38a169;
+}
+
+.metric-trend.negative {
+  background: rgba(229, 62, 62, 0.1);
+  color: #c53030;
+}
+
+.metric-trend.neutral {
+  background: rgba(160, 174, 192, 0.1);
+  color: #718096;
+}
+
+/* BOTÕES DE AÇÃO DOS GRÁFICOS */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chart-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.chart-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.chart-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.chart-btn:active {
+  transform: scale(0.95);
+}
+
+/* MELHORIAS ADICIONAIS PARA OS GRÁFICOS */
+.chart-card {
+  position: relative;
+}
+
+.chart-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.02) 0%, rgba(118, 75, 162, 0.02) 100%);
+  pointer-events: none;
+  border-radius: 16px;
+}
+
+/* ANIMAÇÕES ADICIONAIS */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.metric-card {
+  animation: slideInUp 0.6s ease forwards;
+}
+
+.metric-card:nth-child(1) { animation-delay: 0.1s; }
+.metric-card:nth-child(2) { animation-delay: 0.2s; }
+.metric-card:nth-child(3) { animation-delay: 0.3s; }
+.metric-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* RESPONSIVIDADE PARA MÉTRICAS */
+@media (max-width: 1200px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+  
+  .metric-card {
+    padding: 15px;
+  }
+  
+  .metric-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .metric-value {
+    font-size: 1.3rem;
+  }
+  
+  .metric-content h3 {
+    font-size: 0.75rem;
+  }
+  
+  .chart-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .chart-actions {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+  
+  .metric-card {
+    padding: 15px;
+  }
+  
+  .metric-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+  }
+  
+  .metric-value {
+    font-size: 1.3rem;
+  }
+  
+  .chart-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 0.7rem;
+  }
+}
+
+

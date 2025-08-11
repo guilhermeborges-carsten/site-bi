@@ -1,29 +1,154 @@
 {% extends 'base.html' %}
-{% block title %}Editar Usuário{% endblock %}
+{% block title %}Editar Usuário - Sistema BI{% endblock %}
 {% block content %}
-  <div class="login-container" style="max-width:500px;">
-    <h2 style="text-align:center; color:#0056a6; margin-bottom:24px;">Editar Usuário</h2>
-    <form method="POST">
-      <label for="nome" style="font-weight:bold; color:#0056a6;">Nome</label>
-      <input type="text" id="nome" name="nome" value="{{ usuario.nome }}" required>
-      <label for="email" style="font-weight:bold; color:#0056a6;">Email</label>
-      <input type="email" id="email" name="email" value="{{ usuario.email }}" required>
-      <label for="senha" style="font-weight:bold; color:#0056a6;">Nova Senha (deixe em branco para não alterar)</label>
-      <input type="password" id="senha" name="senha" placeholder="Nova senha">
-      <label for="tipo" style="font-weight:bold; color:#0056a6;">Tipo de Usuário</label>
-      <select id="tipo" name="tipo">
-        <option value="usuario" {% if usuario.tipo == 'usuario' %}selected{% endif %}>Usuário</option>
-        <option value="admin" {% if usuario.tipo == 'admin' %}selected{% endif %}>Admin</option>
-      </select>
-      <button type="submit" style="margin-top:16px;">Salvar Alterações</button>
-    </form>
-    <div style="text-align:center; margin-top:20px;">
-      <a href="{{ url_for('usuarios') }}" style="color:#0056a6; font-weight:bold;">&larr; Voltar para Controle de Usuários</a>
+  <div style="max-width: 600px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h1>Editar Usuário</h1>
+      <a href="{{ url_for('usuarios') }}" class="btn">
+        <i class="fas fa-arrow-left"></i>
+        Voltar
+      </a>
     </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>
+          <i class="fas fa-user-edit"></i>
+          Informações do Usuário
+        </h2>
+        <p>Atualize as informações do usuário {{ usuario.nome }}</p>
+      </div>
+      
+      <div class="card-body">
+        <form method="POST" style="display: flex; flex-direction: column; gap: 1.5rem;">
+          <div>
+            <label for="nome">
+              <i class="fas fa-user"></i>
+              Nome Completo
+            </label>
+            <input type="text" id="nome" name="nome" value="{{ usuario.nome }}" required>
+          </div>
+
+          <div>
+            <label for="email">
+              <i class="fas fa-envelope"></i>
+              Email
+            </label>
+            <input type="email" id="email" name="email" value="{{ usuario.email }}" required>
+          </div>
+
+          <div>
+            <label for="senha">
+              <i class="fas fa-lock"></i>
+              Nova Senha
+            </label>
+            <input type="password" id="senha" name="senha" placeholder="Deixe em branco para não alterar">
+            <small style="color: #718096; font-size: 0.85rem; margin-top: 0.5rem; display: block;">
+              <i class="fas fa-info-circle"></i>
+              Deixe este campo em branco se não deseja alterar a senha atual
+            </small>
+          </div>
+
+          <div>
+            <label for="tipo">
+              <i class="fas fa-user-tag"></i>
+              Tipo de Usuário
+            </label>
+            <select id="tipo" name="tipo" required>
+              <option value="usuario" {% if usuario.tipo == 'usuario' %}selected{% endif %}>
+                <i class="fas fa-user"></i> Usuário
+              </option>
+              <option value="admin" {% if usuario.tipo == 'admin' %}selected{% endif %}>
+                <i class="fas fa-crown"></i> Administrador
+              </option>
+            </select>
+          </div>
+
+          <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+            <button type="submit" class="btn btn-success" style="flex: 1;">
+              <i class="fas fa-save"></i>
+              Salvar Alterações
+            </button>
+            <a href="{{ url_for('usuarios') }}" class="btn" style="flex: 0 0 auto;">
+              <i class="fas fa-times"></i>
+              Cancelar
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Informações do usuário -->
+    <div class="card" style="margin-top: 2rem;">
+      <div class="card-header">
+        <h3>
+          <i class="fas fa-info-circle"></i>
+          Informações Atuais
+        </h3>
+      </div>
+      <div class="card-body">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+          <div>
+            <strong style="color: #4a5568;">ID do Usuário:</strong>
+            <div style="color: #2d3748; margin-top: 0.25rem;">#{{ usuario.id }}</div>
+          </div>
+          <div>
+            <strong style="color: #4a5568;">Status:</strong>
+            <div style="margin-top: 0.25rem;">
+              <span style="
+                padding: 0.25rem 0.75rem; 
+                border-radius: 20px; 
+                font-size: 0.85rem; 
+                font-weight: 600;
+                background: #c6f6d5; 
+                color: #22543d;
+              ">
+                <i class="fas fa-check-circle" style="margin-right: 0.25rem;"></i>
+                Ativo
+              </span>
+            </div>
+          </div>
+          <div>
+            <strong style="color: #4a5568;">Tipo Atual:</strong>
+            <div style="margin-top: 0.25rem;">
+              <span style="
+                padding: 0.25rem 0.75rem; 
+                border-radius: 20px; 
+                font-size: 0.85rem; 
+                font-weight: 600;
+                {% if usuario.tipo == 'admin' %}
+                  background: #fed7d7; 
+                  color: #742a2a;
+                {% else %}
+                  background: #c6f6d5; 
+                  color: #22543d;
+                {% endif %}
+              ">
+                <i class="fas fa-{% if usuario.tipo == 'admin' %}crown{% else %}user{% endif %}" style="margin-right: 0.25rem;"></i>
+                {{ usuario.tipo|title }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     {% with messages = get_flashed_messages() %}
       {% if messages %}
         <div class="flash">{{ messages[0] }}</div>
       {% endif %}
     {% endwith %}
   </div>
+
+  <style>
+    @media (max-width: 768px) {
+      .card form > div[style*="grid"] {
+        grid-template-columns: 1fr;
+      }
+      
+      .card form > div[style*="flex"] {
+        flex-direction: column;
+      }
+    }
+  </style>
 {% endblock %} 

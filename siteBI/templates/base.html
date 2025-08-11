@@ -1,35 +1,39 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>{% block title %}Sistema BI{% endblock %}</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema BI{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  {% if current_user.is_authenticated %}
-  <div class="sidebar">
-    <h2 class="sidebar-title">BI Chamados</h2>
-    <ul>
-      <li><a href="{{ url_for('dashboard') }}"><i class="fa fa-home"></i> Dashboard</a></li>
-      <li><a href="{{ url_for('novo_chamado') }}"><i class="fa fa-plus-circle"></i> Novo Chamado</a></li>
-      {% if current_user.tipo == 'admin' %}
-      <li><a href="{{ url_for('usuarios') }}"><i class="fa fa-users"></i> Controle de Usuários</a></li>
-      <li><a href="{{ url_for('estatisticas') }}"><i class="fa fa-chart-bar"></i> Estatísticas</a></li>
-      <li><a href="{{ url_for('auditoria') }}"><i class="fa fa-clipboard-list"></i> Auditoria</a></li>
-      <li><a href="{{ url_for('dailyboard_listas') }}"><i class="fa fa-list"></i> Colunas do Board</a></li>
-      {% endif %}
-      <li><a href="{{ url_for('logout') }}"><i class="fa fa-sign-out-alt"></i> Sair</a></li>
-    </ul>
-    <div class="sidebar-logo" style="width:100%; display:flex; justify-content:center; align-items:center; margin-top:auto; margin-bottom:48px; padding:0;">
-      <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="display:block; margin:0 auto; height:54px;">
+    {% if current_user.is_authenticated %}
+    <div class="sidebar">
+        <h2>BI Chamados</h2>
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+            <li><a href="{{ url_for('novo_chamado') }}"><i class="fas fa-plus-circle"></i> Novo Chamado</a></li>
+            {% if current_user.tipo == 'admin' %}
+            <li><a href="{{ url_for('dailyboard') }}"><i class="fas fa-tasks"></i> Daily Board</a></li>
+            <li><a href="{{ url_for('usuarios') }}"><i class="fas fa-users"></i> Controle de Usuários</a></li>
+            <li><a href="{{ url_for('estatisticas') }}"><i class="fas fa-chart-bar"></i> Estatísticas</a></li>
+            <li><a href="{{ url_for('auditoria') }}"><i class="fas fa-shield-alt"></i> Auditoria</a></li>
+            <li><a href="{{ url_for('dailyboard_listas') }}"><i class="fas fa-columns"></i> Colunas do Board</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Sair</a></li>
+        </ul>
+        <div style="width:100%; display:flex; justify-content:center; align-items:center; margin-top:auto; margin-bottom:48px; padding:0;">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo" style="display:block; margin:0 auto; height:54px;">
+        </div>
     </div>
-  </div>
-  {% endif %}
-  <div class="main">
-    {% block content %}{% endblock %}
-  </div>
+    <div class="main-content">
+        {% block content %}{% endblock %}
+    </div>
+    {% else %}
+    <div class="auth-content">
+        {% block auth_content %}{% endblock %}
+    </div>
+    {% endif %}
 </body>
 </html>

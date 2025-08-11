@@ -1,36 +1,197 @@
 {% extends 'base.html' %}
-{% block title %}Controle de Usuários{% endblock %}
+{% block title %}Controle de Usuários - Sistema BI{% endblock %}
 {% block content %}
-  <div style="max-width:900px; margin:0 auto;">
-    <h2 style="text-align:center; color:#0056a6; margin-bottom:32px;">Controle de Usuários</h2>
-    <table style="width:100%; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.04); overflow:hidden;">
-      <thead style="background:#0056a6; color:#fff;">
-        <tr>
-          <th style="padding:12px;">ID</th>
-          <th>Nome</th>
-          <th>Email</th>
-          <th>Tipo</th>
-          {% if current_user.tipo == 'admin' %}<th>Ações</th>{% endif %}
-        </tr>
-      </thead>
-      <tbody>
-        {% for usuario in usuarios %}
-        <tr style="text-align:center; border-bottom:1px solid #eee;">
-          <td style="padding:10px;">{{ usuario.id }}</td>
-          <td>{{ usuario.nome }}</td>
-          <td>{{ usuario.email }}</td>
-          <td>{% if usuario.tipo == 'admin' %}<span style="color:#e10600; font-weight:bold;">Admin</span>{% else %}Usuário{% endif %}</td>
-          {% if current_user.tipo == 'admin' %}
-          <td>
-            <a href="{{ url_for('editar_usuario', id=usuario.id) }}" style="color:#0056a6; font-weight:bold; margin-right:10px;">Editar</a>
-            <form method="POST" action="{{ url_for('excluir_usuario', id=usuario.id) }}" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir este usuário?');">
-              <button type="submit" style="background:#e10600; color:#fff; border:none; border-radius:4px; padding:6px 12px; font-weight:bold; cursor:pointer;">Excluir</button>
-            </form>
-          </td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+  <div style="max-width: 1000px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h1>Controle de Usuários</h1>
+      <a href="{{ url_for('cadastro') }}" class="btn btn-success">
+        <i class="fas fa-user-plus"></i>
+        Novo Usuário
+      </a>
+    </div>
+
+    <div class="card">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th style="text-align: left;">ID</th>
+              <th style="text-align: left;">Nome</th>
+              <th style="text-align: left;">Email</th>
+              <th style="text-align: center;">Tipo</th>
+              <th style="text-align: center;">Status</th>
+              {% if current_user.tipo == 'admin' %}
+              <th style="text-align: center;">Ações</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for usuario in usuarios %}
+            <tr>
+              <td style="font-weight: 600; color: #4a5568;">#{{ usuario.id }}</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  <div style="
+                    width: 40px; 
+                    height: 40px; 
+                    border-radius: 50%; 
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    color: white; 
+                    font-weight: 600;
+                    font-size: 0.9rem;
+                  ">
+                    {{ usuario.nome[:2].upper() }}
+                  </div>
+                  <span style="font-weight: 500; color: #2d3748;">{{ usuario.nome }}</span>
+                </div>
+              </td>
+              <td style="color: #4a5568;">{{ usuario.email }}</td>
+              <td style="text-align: center;">
+                {% if usuario.tipo == 'admin' %}
+                <span class="badge badge-admin">
+                  <i class="fas fa-crown" style="margin-right: 0.25rem;"></i>
+                  {{ usuario.tipo|title }}
+                </span>
+                {% else %}
+                <span class="badge badge-user">
+                  <i class="fas fa-user" style="margin-right: 0.25rem;"></i>
+                  {{ usuario.tipo|title }}
+                </span>
+                {% endif %}
+              </td>
+              <td style="text-align: center;">
+                <span class="badge badge-ativo">
+                  <i class="fas fa-check-circle" style="margin-right: 0.25rem;"></i>
+                  Ativo
+                </span>
+              </td>
+              {% if current_user.tipo == 'admin' %}
+              <td style="text-align: center;">
+                <div class="btn-group">
+                  <a href="{{ url_for('editar_usuario', id=usuario.id) }}" 
+                     class="btn btn-sm" 
+                     title="Editar usuário">
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <form method="POST" 
+                        action="{{ url_for('excluir_usuario', id=usuario.id) }}" 
+                        class="inline-form"
+                        onsubmit="return confirm('Tem certeza que deseja excluir o usuário {{ usuario.nome }}? Esta ação não pode ser desfeita.');">
+                    <button type="submit" 
+                            class="btn btn-danger btn-sm" 
+                            title="Excluir usuário">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+              {% endif %}
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="{% if current_user.tipo == 'admin' %}6{% else %}5{% endif %}" style="text-align: center; padding: 3rem; color: #718096;">
+                <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; display: block; color: #cbd5e0;"></i>
+                <h3 style="color: #718096; margin-bottom: 0.5rem;">Nenhum usuário encontrado</h3>
+                <p style="color: #a0aec0; margin: 0;">Não há usuários cadastrados no sistema.</p>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Estatísticas rápidas -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem;">
+      <div class="card-metric">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">
+          <i class="fas fa-users"></i>
+        </div>
+        <div style="font-size: 1.5rem; font-weight: 700;">{{ usuarios|length }}</div>
+        <div style="font-size: 0.9rem; opacity: 0.8;">Total de Usuários</div>
+      </div>
+      
+      <div class="card-metric green">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">
+          <i class="fas fa-user"></i>
+        </div>
+        <div style="font-size: 1.5rem; font-weight: 700;">
+          {{ usuarios|selectattr('tipo', 'equalto', 'usuario')|list|length }}
+        </div>
+        <div style="font-size: 0.9rem; opacity: 0.8;">Usuários Comuns</div>
+      </div>
+      
+      <div class="card-metric yellow">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">
+          <i class="fas fa-crown"></i>
+        </div>
+        <div style="font-size: 1.5rem; font-weight: 700;">
+          {{ usuarios|selectattr('tipo', 'equalto', 'admin')|list|length }}
+        </div>
+        <div style="font-size: 0.9rem; opacity: 0.8;">Administradores</div>
+      </div>
+    </div>
   </div>
+
+  <style>
+    /* Badges para tipos de usuário */
+    .badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .badge-admin {
+      background: #fed7d7;
+      color: #742a2a;
+    }
+    
+    .badge-user {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+    
+    .badge-ativo {
+      background: #c6f6d5;
+      color: #22543d;
+    }
+    
+    /* Card metrics */
+    .card-metric {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    .card-metric.green {
+      border-left: 4px solid #48bb78;
+    }
+    
+    .card-metric.yellow {
+      border-left: 4px solid #ed8936;
+    }
+    
+    @media (max-width: 768px) {
+      .card table {
+        font-size: 0.9rem;
+      }
+      
+      .card th,
+      .card td {
+        padding: 0.75rem 0.5rem;
+      }
+      
+      .card td:nth-child(2) {
+        min-width: 200px;
+      }
+    }
+  </style>
 {% endblock %} 
