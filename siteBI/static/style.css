@@ -243,6 +243,107 @@ body {
   padding: 20px;
 }
 
+/* Login responsivo e confortável em qualquer resolução */
+.login-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  width: min(560px, 92vw);
+  background: rgba(255, 255, 255, 0.98);
+  padding: 28px;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 0.25rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #2d3748;
+}
+
+.login-card .form-group {
+  margin-bottom: 14px;
+}
+
+.login-card label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+.login-card input[type="email"],
+.login-card input[type="password"],
+.login-card input[type="text"],
+.login-card input[type="number"] {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #cbd5e0;
+  border-radius: 10px;
+  font-size: 1rem;
+  background: #fff;
+  outline: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.login-card input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+}
+
+/* Estilo base do botão (com fallback caso não exista) */
+.btn {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: none;
+  color: #fff;
+  background: linear-gradient(45deg, #667eea, #764ba2);
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.login-links {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.login-links a {
+  color: #2b6cb0;
+  text-decoration: none;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+/* Ajustes finos para telas muito grandes */
+@media (min-width: 1600px) {
+  .login-card {
+    width: 600px;
+    padding: 32px;
+  }
+  .login-card h2 {
+    font-size: 1.8rem;
+  }
+}
+
 /* Cards modernos */
 .card {
   background: white;
@@ -619,8 +720,7 @@ table td form.task-form .btn-group *:not(.btn):not(button) {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  /* Animação de rotação removida */
 }
 
 /* Flash messages com fade out */
@@ -1583,11 +1683,10 @@ form .btn-group *:not(.btn):not(button):not(input):not(select):not(textarea):not
 
 .chart-btn:hover {
   background: rgba(255, 255, 255, 0.3);
-  transform: scale(1.1);
 }
 
 .chart-btn:active {
-  transform: scale(0.95);
+  /* Animação de escala removida */
 }
 
 /* MELHORIAS ADICIONAIS PARA OS GRÁFICOS */

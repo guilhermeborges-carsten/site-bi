@@ -189,32 +189,9 @@ class SistemaBI {
     }
   }
 
-  // Efeitos 3D
+  // Efeitos 3D - DESABILITADO
   init3DEffects() {
-    document.querySelectorAll('.card, .chamado-item, .card-metric').forEach(element => {
-      element.addEventListener('mousemove', (e) => {
-        const rect = element.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 10;
-        const rotateY = (centerX - x) / 10;
-        
-        element.style.transform = `
-          perspective(1000px) 
-          rotateX(${rotateX}deg) 
-          rotateY(${rotateY}deg) 
-          scale(1.02)
-        `;
-      });
-
-      element.addEventListener('mouseleave', () => {
-        element.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)';
-      });
-    });
+    // Animações 3D removidas para melhor usabilidade
   }
 
   // Atalhos de teclado avançados
@@ -258,29 +235,9 @@ class SistemaBI {
     });
   }
 
-  // Animações avançadas
+  // Animações avançadas - DESABILITADO
   initAnimations() {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: '0px 0px -50px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0) scale(1)';
-          entry.target.classList.add('animated');
-        }
-      });
-    }, observerOptions);
-
-    document.querySelectorAll('.card, .chamado-item, .card-metric').forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(30px) scale(0.95)';
-      el.style.transition = 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-      observer.observe(el);
-    });
+    // Animações de escala removidas para melhor usabilidade
   }
 
   // Toggle de tema escuro
@@ -375,14 +332,14 @@ class SistemaBI {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.style.opacity = '1';
-          entry.target.style.transform = 'translateY(0) scale(1)';
+          entry.target.style.transform = 'translateY(0)';
         }
       });
     }, observerOptions);
 
     document.querySelectorAll('.card, .chamado-item, .card-metric').forEach(el => {
       el.style.opacity = '0';
-      el.style.transform = 'translateY(30px) scale(0.95)';
+      el.style.transform = 'translateY(30px)';
       el.style.transition = 'opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
       observer.observe(el);
     });
@@ -399,14 +356,12 @@ class SistemaBI {
         });
       }
 
-      // Efeito de foco
+      // Efeito de foco - DESABILITADO
       input.addEventListener('focus', function() {
-        this.parentElement.style.transform = 'scale(1.02)';
         this.parentElement.classList.add('focused');
       });
 
       input.addEventListener('blur', function() {
-        this.parentElement.style.transform = 'scale(1)';
         this.parentElement.classList.remove('focused');
       });
 
@@ -456,10 +411,8 @@ class SistemaBI {
           if (text.includes(searchTerm)) {
             item.style.display = '';
             item.style.opacity = '1';
-            item.style.transform = 'scale(1)';
           } else {
             item.style.opacity = '0.3';
-            item.style.transform = 'scale(0.95)';
           }
         });
       });
@@ -606,11 +559,11 @@ class SistemaBI {
   setupHoverEffects() {
     document.querySelectorAll('.chamado-item, .card').forEach(item => {
       item.addEventListener('mouseenter', function() {
-        this.style.transform = 'translateY(-4px) scale(1.02)';
+        this.style.transform = 'translateY(-4px)';
       });
       
       item.addEventListener('mouseleave', function() {
-        this.style.transform = 'translateY(0) scale(1)';
+        this.style.transform = 'translateY(0)';
       });
     });
   }
@@ -786,7 +739,7 @@ advancedStyles.textContent = `
   
   @keyframes ripple-animation {
     to {
-      transform: scale(4);
+      transform: scale(1);
       opacity: 0;
     }
   }
@@ -796,14 +749,14 @@ advancedStyles.textContent = `
   }
   
   @keyframes tooltip-fade-in {
-    from { opacity: 0; transform: translateY(10px) scale(0.9); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
   }
   
   .back-to-top:hover,
   .voice-btn:hover,
   .theme-toggle:hover {
-    transform: translateY(-2px) scale(1.1);
+    transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
   }
   
@@ -887,10 +840,10 @@ advancedStyles.textContent = `
   }
   
   @keyframes bounce-in {
-    0% { transform: scale(0.3); opacity: 0; }
-    50% { transform: scale(1.05); }
-    70% { transform: scale(0.9); }
-    100% { transform: scale(1); opacity: 1; }
+    0% { opacity: 0; }
+    50% { opacity: 0.5; }
+    70% { opacity: 0.7; }
+    100% { opacity: 1; }
   }
 `;
 
