@@ -13,7 +13,7 @@
           <i class="fas fa-filter"></i> Filtros
         </h3>
         <div class="filtros-box" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-          {% if current_user.tipo == 'admin' %}
+          {% if current_user.tipo == 'Admin' %}
             <div class="form-group">
               <label for="status">Status</label>
               <select id="status" name="status">
@@ -117,13 +117,13 @@
                 </div>
               </div>
               
-              {% if current_user.tipo == 'admin' %}
+              {% if current_user.tipo == 'Admin' %}
               <div style="margin-left: 1rem;">
                 <form method="POST" action="{{ url_for('atribuir_responsavel', chamado_id=c.id) }}" style="display: flex; gap: 0.5rem; align-items: center;">
                   <select name="responsavel_id" style="padding: 0.5rem; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem;">
-                    <option value="">-- Escolher admin --</option>
-                    {% for admin in colaboradores if admin.tipo == 'admin' %}
-                      <option value="{{ admin.id }}" {% if c.responsavel_id == admin.id %}selected{% endif %}>{{ admin.nome }}</option>
+                    <option value="">-- Escolher Admin --</option>
+                    {% for Admin in colaboradores if Admin.tipo == 'Admin' %}
+                      <option value="{{ Admin.id }}" {% if c.responsavel_id == Admin.id %}selected{% endif %}>{{ Admin.nome }}</option>
                     {% endfor %}
                   </select>
                   <button type="submit" class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">

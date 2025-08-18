@@ -14,7 +14,7 @@
         <ul>
             <li><a href="{{ url_for('dashboard') }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             <li><a href="{{ url_for('novo_chamado') }}"><i class="fas fa-plus-circle"></i> Novo Chamado</a></li>
-            {% if current_user.tipo == 'admin' %}
+            {% if current_user.tipo == 'Admin' %}
             <li><a href="{{ url_for('dailyboard') }}"><i class="fas fa-tasks"></i> Daily Board</a></li>
             <li><a href="{{ url_for('usuarios') }}"><i class="fas fa-users"></i> Controle de Usuários</a></li>
             <li><a href="{{ url_for('estatisticas') }}"><i class="fas fa-chart-bar"></i> Estatísticas</a></li>

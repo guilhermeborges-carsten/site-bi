@@ -50,7 +50,7 @@
               </td>
               <td style="color: #4a5568;">{{ usuario.email }}</td>
               <td style="text-align: center;">
-                {% if usuario.tipo == 'admin' %}
+                {% if usuario.tipo == 'Admin' %}
                 <span class="badge badge-admin">
                   <i class="fas fa-crown" style="margin-right: 0.25rem;"></i>
                   {{ usuario.tipo|title }}
@@ -68,7 +68,7 @@
                   Ativo
                 </span>
               </td>
-              {% if current_user.tipo == 'admin' %}
+              {% if current_user.tipo == 'Admin' %}
               <td style="text-align: center;">
                 <div class="btn-group">
                   <a href="{{ url_for('editar_usuario', id=usuario.id) }}" 
@@ -92,7 +92,7 @@
             </tr>
             {% else %}
             <tr>
-              <td colspan="{% if current_user.tipo == 'admin' %}6{% else %}5{% endif %}" style="text-align: center; padding: 3rem; color: #718096;">
+              <td colspan="{% if current_user.tipo == 'Admin' %}6{% else %}5{% endif %}" style="text-align: center; padding: 3rem; color: #718096;">
                 <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; display: block; color: #cbd5e0;"></i>
                 <h3 style="color: #718096; margin-bottom: 0.5rem;">Nenhum usuário encontrado</h3>
                 <p style="color: #a0aec0; margin: 0;">Não há usuários cadastrados no sistema.</p>
@@ -129,7 +129,7 @@
           <i class="fas fa-crown"></i>
         </div>
         <div style="font-size: 1.5rem; font-weight: 700;">
-          {{ usuarios|selectattr('tipo', 'equalto', 'admin')|list|length }}
+          {{ usuarios|selectattr('tipo', 'equalto', 'Admin')|list|length }}
         </div>
         <div style="font-size: 0.9rem; opacity: 0.8;">Administradores</div>
       </div>

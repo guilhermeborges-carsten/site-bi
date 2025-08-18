@@ -7,13 +7,14 @@ from datetime import datetime
 import os
 from collections import Counter, defaultdict
 import pytz
+from config import config
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'sua_chave_secreta_aqui'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///chamados.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB
+
+# Configuração do ambiente (desenvolvimento por padrão)
+config_name = os.environ.get('FLASK_ENV', 'development')
+app.config.from_object(config[config_name])
+config[config_name].init_app(app)
 
 # Configurações de performance
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 31536000  # 1 ano de cache para arquivos estáticos
@@ -141,7 +142,7 @@ def logout():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    if current_user.tipo == 'admin':
+    if current_user.tipo == 'Admin':
         return redirect(url_for('dailyboard'))
     else:
         # Filtros
@@ -247,7 +248,7 @@ def detalhes_chamado(id):
     db.session.commit()
     if request.method == 'POST':
         # Se admin, pode alterar status
-        if current_user.tipo == 'admin' and 'novo_status' in request.form:
+        if current_user.tipo == 'Admin' and 'novo_status' in request.form:
             chamado.status = request.form['novo_status']
             db.session.commit()
             flash('Status do chamado atualizado!')
@@ -273,9 +274,12 @@ def cadastro():
         nome = request.form['nome']
         email = request.form['email']
         senha = request.form['senha']
+        
+        # Impede emails duplicados
         if Usuario.query.filter_by(email=email).first():
             flash('Email já cadastrado')
             return render_template('cadastro.html')
+        
         senha_hash = generate_password_hash(senha)
         novo_usuario = Usuario()
         novo_usuario.nome = nome
@@ -291,7 +295,7 @@ def cadastro():
 @app.route('/usuarios')
 @login_required
 def usuarios():
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     lista_usuarios = Usuario.query.all()
     return render_template('usuarios.html', usuarios=lista_usuarios)
@@ -299,7 +303,7 @@ def usuarios():
 @app.route('/usuario/<int:id>/editar', methods=['GET', 'POST'])
 @login_required
 def editar_usuario(id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     usuario = Usuario.query.get_or_404(id)
     if request.method == 'POST':
@@ -323,7 +327,7 @@ def editar_usuario(id):
 @app.route('/usuario/<int:id>/excluir', methods=['POST'])
 @login_required
 def excluir_usuario(id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     usuario = Usuario.query.get_or_404(id)
     if usuario.id == current_user.id:
@@ -349,7 +353,7 @@ def download_anexo(filename):
 @app.route('/estatisticas')
 @login_required
 def estatisticas():
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     # Filtros
     status = request.args.get('status')
@@ -426,7 +430,7 @@ def estatisticas():
 @app.route('/dailyboard', methods=['GET', 'POST'])
 @login_required
 def dailyboard():
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     protocolo = request.args.get('protocolo')
     if protocolo:
@@ -461,7 +465,7 @@ def dailyboard():
 @app.route('/dailyboard/mover_card', methods=['POST'])
 @login_required
 def mover_card():
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     data = request.get_json()
     card_id = data.get('card_id')
@@ -508,7 +512,7 @@ def dailyboard_card(card_id):
                 db.session.add(leitura)
         db.session.commit()
     # Alteração de status do chamado
-    if request.method == 'POST' and request.form.get('tipo_form') == 'status' and current_user.tipo == 'admin' and chamado:
+    if request.method == 'POST' and request.form.get('tipo_form') == 'status' and current_user.tipo == 'Admin' and chamado:
         novo_status = request.form.get('novo_status')
         if novo_status and novo_status != chamado.status:
             chamado.status = novo_status
@@ -516,7 +520,7 @@ def dailyboard_card(card_id):
             flash('Status do chamado atualizado!')
             return redirect(url_for('dailyboard_card', card_id=card_id))
     # Comentário interno admin
-    if request.method == 'POST' and request.form.get('tipo_form') == 'interno' and current_user.tipo == 'admin':
+    if request.method == 'POST' and request.form.get('tipo_form') == 'interno' and current_user.tipo == 'Admin':
         conteudo = request.form.get('comentario_interno')
         if conteudo:
             ci = ComentarioInternoKanban()
@@ -558,7 +562,7 @@ def dailyboard_card(card_id):
 @app.route('/dailyboard/listas', methods=['GET', 'POST'])
 @login_required
 def dailyboard_listas():
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     
     if request.method == 'POST':
@@ -630,14 +634,14 @@ def dailyboard_listas():
     ).order_by(ListaKanban.ordem).all()
     
     # Otimização: buscar apenas usuários admin necessários
-    usuarios = Usuario.query.filter_by(tipo='admin').all()
+    usuarios = Usuario.query.filter_by(tipo='Admin').all()
     
     return render_template('listas_kanban.html', listas=listas, usuarios=usuarios)
 
 @app.route('/dailyboard/listas/<int:lista_id>/editar', methods=['POST'])
 @login_required
 def editar_lista_kanban(lista_id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     
     try:
@@ -682,7 +686,7 @@ def editar_lista_kanban(lista_id):
 @app.route('/dailyboard/listas/<int:lista_id>/excluir', methods=['POST'])
 @login_required
 def excluir_lista_kanban(lista_id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     
     try:
@@ -721,7 +725,7 @@ def excluir_lista_kanban(lista_id):
 @app.route('/dailyboard/card/<int:card_id>/finalizar', methods=['POST'])
 @login_required
 def finalizar_card_kanban(card_id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     card = CardKanban.query.get_or_404(card_id)
     coluna_concluido = ListaKanban.query.filter(
@@ -743,7 +747,7 @@ def finalizar_card_kanban(card_id):
 @app.route('/dailyboard/historico')
 @login_required
 def dailyboard_historico():
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     
     try:
@@ -909,25 +913,24 @@ def formata_data(dt, formato='%d/%m/%Y %H:%M'):
 @app.route('/auditoria')
 @login_required
 def auditoria():
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     logs = AuditoriaLog.query.order_by(AuditoriaLog.data.desc()).all()
     usuarios = {u.id: u.nome for u in Usuario.query.all()}
     return render_template('auditoria.html', logs=logs, usuarios=usuarios)
 
-# CRIAR BANCO DE DADOS INICIAL
-if not os.path.exists('chamados.db'):
-    with app.app_context():
-        db.create_all()
-        # Verifica se já existe o admin
-        if not Usuario.query.filter_by(email='admin@empresa.com').first():
-            admin = Usuario()
-            admin.nome = 'Admin'
-            admin.email = 'admin@empresa.com'
-            admin.senha = generate_password_hash('admin123')
-            admin.tipo = 'admin'
-            db.session.add(admin)
-            db.session.commit()
+# INICIALIZAÇÃO DO BANCO DE DADOS
+with app.app_context():
+    try:
+        # Verificar conexão com o banco
+        with db.engine.connect() as connection:
+            connection.execute(db.text('SELECT 1'))
+        print("✅ Conexão com banco MySQL estabelecida com sucesso!")
+        print("🎯 Sistema pronto para uso!")
+            
+    except Exception as e:
+        print(f"❌ Erro ao conectar com o banco de dados: {str(e)}")
+        print("Verifique se o MySQL está rodando e as configurações estão corretas.")
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', threaded=True)

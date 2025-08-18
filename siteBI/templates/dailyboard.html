@@ -57,12 +57,12 @@
               {% set responsavel = (usuarios|selectattr('id', 'equalto', card.responsavel_id)|first) %}
               <div style="font-size: 0.9rem; color: #718096; margin-bottom: 0.5rem;">
                 <i class="fas fa-user-tie"></i> Responsável: <strong>{% if responsavel %}{{ responsavel.nome }}{% else %}Time de BI{% endif %}</strong>
-                {% if current_user.tipo == 'admin' and card.chamado_id %}
+                {% if current_user.tipo == 'Admin' and card.chamado_id %}
                 <form method="POST" action="{{ url_for('atribuir_responsavel', chamado_id=card.chamado_id) }}" style="display: inline; margin-left: 0.5rem;">
                   <select name="responsavel_id" style="padding: 0.25rem 0.5rem; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 0.85rem;">
                     <option value="">Time de BI</option>
-                    {% for admin in usuarios if admin.tipo == 'admin' %}
-                      <option value="{{ admin.id }}" {% if card.responsavel_id == admin.id %}selected{% endif %}>{{ admin.nome }}</option>
+                    {% for Admin in usuarios if Admin.tipo == 'Admin' %}
+                      <option value="{{ Admin.id }}" {% if card.responsavel_id == Admin.id %}selected{% endif %}>{{ Admin.nome }}</option>
                     {% endfor %}
                   </select>
                   <button type="submit" class="btn" style="padding: 0.25rem 0.75rem; font-size: 0.85rem; margin-left: 0.25rem;">

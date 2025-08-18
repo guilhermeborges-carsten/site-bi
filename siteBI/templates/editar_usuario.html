@@ -58,7 +58,7 @@
               <option value="usuario" {% if usuario.tipo == 'usuario' %}selected{% endif %}>
                 <i class="fas fa-user"></i> Usuário
               </option>
-              <option value="admin" {% if usuario.tipo == 'admin' %}selected{% endif %}>
+              <option value="Admin" {% if usuario.tipo == 'Admin' %}selected{% endif %}>
                 <i class="fas fa-crown"></i> Administrador
               </option>
             </select>
@@ -124,7 +124,7 @@
                   color: #22543d;
                 {% endif %}
               ">
-                <i class="fas fa-{% if usuario.tipo == 'admin' %}crown{% else %}user{% endif %}" style="margin-right: 0.25rem;"></i>
+                <i class="fas fa-{% if usuario.tipo == 'Admin' %}crown{% else %}user{% endif %}" style="margin-right: 0.25rem;"></i>
                 {{ usuario.tipo|title }}
               </span>
             </div>
