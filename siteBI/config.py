@@ -8,11 +8,6 @@ class Config:
     
     # Configuração do banco MySQL
     # Altere estas configurações conforme seu ambiente
-    MYSQL_HOST = '46.202.151.75'
-    MYSQL_PORT = 3306
-    MYSQL_USER = 'user_bi'
-    MYSQL_PASSWORD = ''  
-    MYSQL_DATABASE = 'BI'
     
     @staticmethod
     def init_app(app):
@@ -39,4 +34,5 @@ config = {
     'production': ProductionConfig,
     'default': DevelopmentConfig
 }
+
 
