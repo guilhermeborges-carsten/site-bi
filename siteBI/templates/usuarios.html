@@ -4,11 +4,58 @@
   <div style="max-width: 1000px; margin: 0 auto;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
       <h1>Controle de Usuários</h1>
-      <a href="{{ url_for('cadastro') }}" class="btn btn-success">
-        <i class="fas fa-user-plus"></i>
-        Novo Usuário
+      <a href="{{ url_for('admin_novo_usuario') }}" class="btn btn-success" style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; font-weight: 600; transition: all 0.2s;">
+        <i class="fas fa-user-plus" style="font-size: 1.1rem;"></i>
+        <span>Novo Usuário</span>
       </a>
     </div>
+
+    <!-- Campo de busca -->
+    <div class="card" style="margin-bottom: 1rem;">
+      <div class="card-body">
+        <form method="GET" action="{{ url_for('usuarios') }}" class="search-form">
+          <div style="display: flex; gap: 1rem; align-items: center;">
+            <div style="flex: 1;">
+              <label for="busca" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568;">
+                <i class="fas fa-search" style="margin-right: 0.5rem;"></i>
+                Buscar usuários
+              </label>
+              <input 
+                type="text" 
+                id="busca" 
+                name="busca" 
+                value="{{ busca or '' }}"
+                placeholder="Digite o nome ou email do usuário..."
+                class="form-control"
+                style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1rem; transition: border-color 0.2s;"
+                oninput="this.style.borderColor = '#667eea'"
+                onblur="this.style.borderColor = '#e2e8f0'"
+              >
+            </div>
+            <div style="display: flex; gap: 0.5rem; align-items: end;">
+              <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">
+                <i class="fas fa-search" style="margin-right: 0.5rem;"></i>
+                Buscar
+              </button>
+              {% if busca %}
+              <a href="{{ url_for('usuarios') }}" class="btn btn-secondary" style="padding: 0.75rem 1.5rem;">
+                <i class="fas fa-times" style="margin-right: 0.5rem;"></i>
+                Limpar
+              </a>
+              {% endif %}
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Resultados da busca -->
+    {% if busca %}
+    <div class="alert alert-info" style="margin-bottom: 1rem; padding: 1rem; background: #ebf8ff; border: 1px solid #bee3f8; border-radius: 8px; color: #2b6cb0;">
+      <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
+      <strong>Resultados da busca:</strong> Encontrados {{ usuarios|length }} usuário(s) para "{{ busca }}"
+    </div>
+    {% endif %}
 
     <div class="card">
       <div class="table-responsive">
@@ -20,7 +67,7 @@
               <th style="text-align: left;">Email</th>
               <th style="text-align: center;">Tipo</th>
               <th style="text-align: center;">Status</th>
-              {% if current_user.tipo == 'admin' %}
+              {% if current_user.tipo == 'Admin' %}
               <th style="text-align: center;">Ações</th>
               {% endif %}
             </tr>
@@ -137,6 +184,45 @@
   </div>
 
   <style>
+    /* Botão Novo Usuário */
+    .btn-success {
+      background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+      border: none;
+      box-shadow: 0 4px 6px rgba(72, 187, 120, 0.2);
+    }
+    
+    .btn-success:hover {
+      background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(72, 187, 120, 0.3);
+    }
+    
+    /* Campo de busca */
+    .search-form .form-control:focus {
+      outline: none;
+      border-color: #667eea !important;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .search-form .btn {
+      transition: all 0.2s;
+    }
+    
+    .search-form .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    /* Alert de resultados */
+    .alert {
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
     /* Badges para tipos de usuário */
     .badge {
       padding: 0.25rem 0.75rem;
@@ -191,6 +277,21 @@
       
       .card td:nth-child(2) {
         min-width: 200px;
+      }
+      
+      /* Responsividade do campo de busca */
+      .search-form > div {
+        flex-direction: column;
+        align-items: stretch !important;
+      }
+      
+      .search-form .btn {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+      
+      .search-form input {
+        margin-bottom: 0.5rem;
       }
     }
   </style>

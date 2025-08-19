@@ -6,3 +6,5 @@ pytz
 waitress 
 gunicorn
 flask-mysqldb
+requests
+cryptography

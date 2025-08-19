@@ -1,41 +1,12 @@
-import os
+# -*- coding: utf-8 -*-
+"""
+Configuração criptografada do Site BI
+Para descriptografar, use: decrypt_config.py
+"""
 
-class Config:
-    SECRET_KEY = 'sua_chave_secreta_aqui'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
-    UPLOAD_FOLDER = 'uploads'
-    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
-    
-    # Configuração do banco MySQL
-    # Altere estas configurações conforme seu ambiente
-    MYSQL_HOST = '46.202.151.75'
-    MYSQL_PORT = 3306
-    MYSQL_USER = 'user_bi'
-    MYSQL_PASSWORD = 'sk15iY4rVGLCoqK0'  
-    MYSQL_DATABASE = 'BI'
-    
-    @staticmethod
-    def init_app(app):
-        # Configurar a URI do banco de dados MySQL
-        if Config.MYSQL_PASSWORD:
-            app.config['SQLALCHEMY_DATABASE_URI'] = (
-                f'mysql://{Config.MYSQL_USER}:{Config.MYSQL_PASSWORD}@'
-                f'{Config.MYSQL_HOST}:{Config.MYSQL_PORT}/{Config.MYSQL_DATABASE}'
-            )
-        else:
-            app.config['SQLALCHEMY_DATABASE_URI'] = (
-                f'mysql://{Config.MYSQL_USER}@'
-                f'{Config.MYSQL_HOST}:{Config.MYSQL_PORT}/{Config.MYSQL_DATABASE}'
-            )
+# Configuração criptografada
+ENCRYPTED_CONFIG = """Z0FBQUFBQm9wSUpaTElzYVlkSWRuekE3bURCWDQ2Z01sMm02TWZCcDEybFFOQ0NkV2RxbDBxenJBVUxtWnVOUUFnTTRIbkl0U3dvcjYxZjJ4YW11TV9JSEFXclFnaDhUUW00YVdPVG5XSTVqVWM5T09jd3ZibERWOFI2dDNkVWVoY2d0ZTdBc21vVnA0WmQ4MUxYUmxkdi1TVlM3QVZPOWpPU2Jad1VVcy1IZW5HcVhaZmNUb21sWjEzY0JtbE9LSkx3NkxBMThoTjBKQl95WWFHb0ZzanN4NnJLekVqR2xaTWpWOXVBYktuX002ZExzSFROcUJmZlRfd0MwMTZsX01wOXRGdV9nU0lENFdxZjZaNWduOFh4bVQyUXlzcHNjeHR3RV9LaVNfeTRPSkY5a1RRSTQzemtzMDFlUjBHWDFtNGN4d3hWWEszUF9iUnd5QkUza0RVYndLQmh0RmhCdkJoN3ltU3dBQTR6QktYN01BQzBWMUxLeWxUaWlfWHJKRDZYMEpweU1zcmxfQ2ZIOENTNzcwMlRWUFBKZDdSeTR2a3RFQkZ3YlhZbGs2MG4xUl9LZjRhbDNfcTI4V3hrYXBDMWZlUlJSVG9ZU09tdkRNRmVuVHUwSDFyZlJUSWwzQWNHS2pVbWRTa3JsZ0dOeXhJWUhLNmVIMDJhRkVEdDJmdUUzZWxoMGpCdEhtbGtNRk52ZXNiSWx0dFVNZERqZXE3UVA5ODQ5WE9vd2paZmxnUV82OGdBMlVZUTNKa3pUeG1sdjRDUnhzSjd3SnM1cGVranI5ajk3NGo2MENYbklYR1NRVFRCSlFhS3FVNzJHTmlqU3FNNTVtX0JhaWNmSnE4cHc2cEJRb0ZINnQtVWNXTldFRHdDYUJ4WHRzckI0MmRkMS10Z1V4ZFphcGt0YzdSMWk0TXlOWXZqRGU2M1REdGxGeHJGMU5Ja0ZNS255Mlp3eHJ5eVZlMWFrSzFMRE9YUUNKVHV6UmNQa2pmdlFYbDJMZ1MxV05nWHdNSkwxTTNaUnRnblA5RmxPcHRkTFcyWU5KX3JFTHpmZ1k2TF96QjduTUdaMFQwN1RjOTVrLVljY3NyQ0c0eHlQdzVCMS1FaDBwbE5raGpidXBRZzZoSGIxRXpEZjlzeVIxS2lGWklRODVXSE9td0dqZHpTRHlwTE9xa3ZOQkFxZXdoejh5UzAxZl8yYkFWeWEwbkVTeHZBTmtMbHhHVC15QXRVMmctV0VmRjZ2NFF3WkJ1WjR2UVVfbU1nS3h5YVRzTmFVcDVpVkY5WUoxbFJMZHJNRnNydnFXdUUwemhXU1BvMEREWnVBNWprSzdYSEFHVmdzV0ZkNkFhLUpPLUtDN2pHcU1TTjVIeXBDaHNfcW9reVlnTnE5N2pQcDl1OTBXb3o4NGJScUVYdUJpZXg0enBxSGNZNHAxZXVsSm9waDQ1Y1RMVXhkVlpVUW1TYWc0QjNYLUVzTUxmbS1nX3FLTzlLTFJRLUtIT3g3RnFqU3NwdmlBRDNpZE1Ddl9DTUJXc1Z6X2ExSklyN0NtRGkxRU0wRE1nZFd0M3NHOXBBMzR5bmVDVm4wSUIzTzcxT2VldWRHR1d1LXVvU2hxY2ZoQjdKMFVkN3RlM1NkSXZsMjl4N2VoeHJWdGgzdE1vZkZOUVcyR1NZcHFxc0NWVndHeGN4RGIwaTM4Uy1YUHB6YVZpYktRbUNSMkRFbDFjdWl1UVJONC1VU0pBSDJpaXN2RFI5WHU1SmNIZG9udkNveFM0dGU3dlpSMkU2bG80SGRONkFkQmc2M2MxNHNxUVRDbUR2UXY0TlYtYnVsdjN1b1pQX0lCaGloX3lGck5Eam5hblhtdEwtY0liNi1QLXlIRmk0RFdESnJhV3VQbTBzMXdlUlR5TVJHVTdtb255YmhMaDBLbmZrUmRJcnVHSkpEUHhOV2dWeVotWTA5Z0VTUy1RcW1IUU5sMTB6ZlVmT1NBcEdCZ2VCZkZvWFpqVi1MRjBDQm1sYmFVRmxvTUZFTEhtR2xmUFRRc19kVHBxdUlqQ0Nnd094QUs0LTZfcHUzRldQXzBJWWhQUTFUYVZVc3RrMDAxSDg3cnpNREFqTnp2eF9tdmRPSzhSZ2FJSWJYcVF4ZngxQlVnZ3pXLTNLdG5hYWxISEdwVk9QeWpfa1dUdnRvUC1IdDUtWGtOaEV3TTJHX1BQbWJMTjFwNWREUVdqbVdfOGlvbW5MMzBwUG4tR1BDMUN4MzhDRF9hajRpMktSdFJtLTZrT1JmcWVDV3Vja0Q5R1NCWU5VPQ=="""
 
-class DevelopmentConfig(Config):
-    DEBUG = True
-
-class ProductionConfig(Config):
-    DEBUG = False
-
-config = {
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'default': DevelopmentConfig
-}
+# Para descriptografar, use:
+# from api_crypto import decrypt_config
+# config_content = decrypt_config(ENCRYPTED_CONFIG)

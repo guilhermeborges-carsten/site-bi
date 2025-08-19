@@ -1,13 +1,95 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Site BI - Sistema de Business Intelligence
+"""
+
+import os
+import signal
+import atexit
+import sys
 from flask import Flask, render_template, redirect, url_for, request, flash, session, abort, send_from_directory, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import or_
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from datetime import datetime
-import os
+import pytz
 from collections import Counter, defaultdict
 import pytz
-from config import config
+from secure_config import config
+
+# Configuração automática de criptografia para produção
+def setup_crypto_automation():
+    """Configura criptografia automática para produção"""
+    if os.environ.get('RENDER') or os.environ.get('PRODUCTION'):
+        print("🔐 Modo produção detectado - Configurando criptografia automática...")
+        
+        try:
+            from local_crypto import LocalCryptoManager
+            crypto = LocalCryptoManager()
+            
+            # Descriptografar na inicialização
+            if os.path.exists('config.encrypted'):
+                print("🔓 Descriptografando configuração para produção...")
+                with open('config.encrypted', 'r', encoding='utf-8') as f:
+                    encrypted_content = f.read()
+                
+                decrypted_content = crypto.decrypt_data(encrypted_content)
+                
+                # Salvar configuração descriptografada
+                with open('config.py', 'w', encoding='utf-8') as f:
+                    f.write(decrypted_content)
+                
+                print("✅ Configuração descriptografada para produção!")
+                
+                # Função para criptografar no encerramento
+                def encrypt_on_shutdown():
+                    print("🔒 Criptografando configuração no encerramento...")
+                    try:
+                        with open('config.py', 'r', encoding='utf-8') as f:
+                            current_content = f.read()
+                        
+                        encrypted_content = crypto.encrypt_data(current_content)
+                        
+                        with open('config.encrypted', 'w', encoding='utf-8') as f:
+                            f.write(encrypted_content)
+                        
+                        # Restaurar config.py seguro
+                        safe_config = '''# -*- coding: utf-8 -*-
+"""
+Configuração segura - Use secure_config.py para carregar
+"""
+from secure_config import config
+'''
+                        with open('config.py', 'w', encoding='utf-8') as f:
+                            f.write(safe_config)
+                        
+                        print("✅ Configuração criptografada e segura!")
+                    except Exception as e:
+                        print(f"⚠️  Erro ao criptografar: {str(e)}")
+                
+                # Registrar hooks de encerramento
+                atexit.register(encrypt_on_shutdown)
+                
+                # Capturar sinais de encerramento
+                def signal_handler(signum, frame):
+                    print(f"📡 Sinal {signum} recebido - Encerrando...")
+                    encrypt_on_shutdown()
+                    sys.exit(0)
+                
+                signal.signal(signal.SIGTERM, signal_handler)
+                signal.signal(signal.SIGINT, signal_handler)
+                
+                print("🔄 Hooks de criptografia automática configurados!")
+                
+        except Exception as e:
+            print(f"⚠️  Erro ao configurar criptografia automática: {str(e)}")
+            print("🔄 Continuando com configuração padrão...")
+
+# Configurar criptografia automática
+setup_crypto_automation()
 
 app = Flask(__name__)
 
@@ -32,8 +114,13 @@ def to_brasilia(dt):
         return pytz.utc.localize(dt).astimezone(BR_TZ)
     return dt.astimezone(BR_TZ)
 
-db = SQLAlchemy(app)
-login_manager = LoginManager(app)
+# Inicializar extensões
+db = SQLAlchemy()
+login_manager = LoginManager()
+
+# Configurar extensões
+db.init_app(app)
+login_manager.init_app(app)
 
 # MODELOS
 class Usuario(db.Model, UserMixin):
@@ -292,13 +379,79 @@ def cadastro():
         return redirect(url_for('login'))
     return render_template('cadastro.html')
 
+@app.route('/admin/novo_usuario', methods=['GET', 'POST'])
+@login_required
+def admin_novo_usuario():
+    if current_user.tipo != 'Admin':
+        abort(403)
+    
+    if request.method == 'POST':
+        nome = request.form['nome']
+        email = request.form['email']
+        senha = request.form['senha']
+        tipo = request.form['tipo']
+        
+        # Validações
+        if not nome or not email or not senha or not tipo:
+            flash('Todos os campos são obrigatórios!', 'error')
+            return render_template('admin_novo_usuario.html')
+        
+        # Impede emails duplicados
+        if Usuario.query.filter_by(email=email).first():
+            flash('Email já cadastrado no sistema!', 'error')
+            return render_template('admin_novo_usuario.html')
+        
+        # Criar novo usuário
+        senha_hash = generate_password_hash(senha)
+        novo_usuario = Usuario()
+        novo_usuario.nome = nome
+        novo_usuario.email = email
+        novo_usuario.senha = senha_hash
+        novo_usuario.tipo = tipo
+        
+        try:
+            db.session.add(novo_usuario)
+            db.session.commit()
+            
+            # Log de auditoria
+            log = AuditoriaLog()
+            log.usuario_id = current_user.id
+            log.acao = 'Criar usuário'
+            log.detalhes = f'Usuário criado: nome={nome}, email={email}, tipo={tipo}'
+            db.session.add(log)
+            db.session.commit()
+            
+            flash('Usuário criado com sucesso!', 'success')
+            return redirect(url_for('usuarios'))
+            
+        except Exception as e:
+            db.session.rollback()
+            flash('Erro ao criar usuário. Tente novamente.', 'error')
+            return render_template('admin_novo_usuario.html')
+    
+    return render_template('admin_novo_usuario.html')
+
 @app.route('/usuarios')
 @login_required
 def usuarios():
     if current_user.tipo != 'Admin':
         abort(403)
-    lista_usuarios = Usuario.query.all()
-    return render_template('usuarios.html', usuarios=lista_usuarios)
+    
+    # Parâmetro de busca
+    busca = request.args.get('busca', '').strip()
+    
+    if busca:
+        # Busca por nome ou email (case insensitive)
+        lista_usuarios = Usuario.query.filter(
+            or_(
+                Usuario.nome.ilike(f'%{busca}%'),
+                Usuario.email.ilike(f'%{busca}%')
+            )
+        ).all()
+    else:
+        lista_usuarios = Usuario.query.all()
+    
+    return render_template('usuarios.html', usuarios=lista_usuarios, busca=busca)
 
 @app.route('/usuario/<int:id>/editar', methods=['GET', 'POST'])
 @login_required
@@ -531,7 +684,7 @@ def dailyboard_card(card_id):
             db.session.commit()
             return redirect(url_for('dailyboard_card', card_id=card_id))
     # Mensagem do chamado
-    if request.method == 'POST' and card.chamado_id and request.form.get('tipo_form') != 'interno' and request.form.get('tipo_form') != 'status' and current_user.tipo == 'admin':
+    if request.method == 'POST' and card.chamado_id and request.form.get('tipo_form') != 'interno' and request.form.get('tipo_form') != 'status' and current_user.tipo == 'Admin':
         conteudo = request.form.get('comentario')
         file = request.files.get('anexo')
         anexo_nome = None
@@ -826,7 +979,7 @@ def dailyboard_historico():
 @app.route('/dailyboard/card/<int:card_id>/excluir', methods=['POST'])
 @login_required
 def excluir_card_kanban(card_id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     card = CardKanban.query.get_or_404(card_id)
     coluna = ListaKanban.query.get(card.lista_id)
@@ -845,7 +998,7 @@ def excluir_card_kanban(card_id):
 @app.route('/atribuir_responsavel/<int:chamado_id>', methods=['POST'])
 @login_required
 def atribuir_responsavel(chamado_id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     chamado = Chamado.query.get_or_404(chamado_id)
     responsavel_id = request.form.get('responsavel_id')
@@ -870,7 +1023,7 @@ def atribuir_responsavel(chamado_id):
 @app.route('/dailyboard/card/<int:card_id>/em_andamento', methods=['POST'])
 @login_required
 def em_andamento_card_kanban(card_id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     card = CardKanban.query.get_or_404(card_id)
     coluna_andamento = ListaKanban.query.filter(ListaKanban.nome.ilike('%andamento%')).first()
@@ -883,7 +1036,7 @@ def em_andamento_card_kanban(card_id):
 @app.route('/dailyboard/card/<int:card_id>/voltar_backlog', methods=['POST'])
 @login_required
 def voltar_backlog_card_kanban(card_id):
-    if current_user.tipo != 'admin':
+    if current_user.tipo != 'Admin':
         abort(403)
     card = CardKanban.query.get_or_404(card_id)
     backlog = ListaKanban.query.filter(ListaKanban.nome.ilike('backlog')).first()
@@ -919,18 +1072,7 @@ def auditoria():
     usuarios = {u.id: u.nome for u in Usuario.query.all()}
     return render_template('auditoria.html', logs=logs, usuarios=usuarios)
 
-# INICIALIZAÇÃO DO BANCO DE DADOS
-with app.app_context():
-    try:
-        # Verificar conexão com o banco
-        with db.engine.connect() as connection:
-            connection.execute(db.text('SELECT 1'))
-        print("✅ Conexão com banco MySQL estabelecida com sucesso!")
-        print("🎯 Sistema pronto para uso!")
-            
-    except Exception as e:
-        print(f"❌ Erro ao conectar com o banco de dados: {str(e)}")
-        print("Verifique se o MySQL está rodando e as configurações estão corretas.")
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', threaded=True)

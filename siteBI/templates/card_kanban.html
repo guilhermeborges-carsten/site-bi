@@ -35,7 +35,7 @@
           </div>
           {% endfor %}
         </div>
-        {% if current_user.tipo == 'admin' %}
+        {% if current_user.tipo == 'Admin' %}
         <form method="POST" enctype="multipart/form-data">
           <div class="form-group">
             <label for="comentario">Nova mensagem</label>
@@ -104,7 +104,7 @@
           <strong><i class="fas fa-align-left"></i> Descrição:</strong> {{ card.descricao }}
         </div>
         
-        {% if current_user.tipo == 'admin' and chamado %}
+        {% if current_user.tipo == 'Admin' and chamado %}
         <div class="card" style="background: #f0fff4; border-left: 4px solid #48bb78; margin-bottom: 1.5rem;">
           <h3 style="color: #2d3748; margin-bottom: 1rem; font-weight: 600;">
             <i class="fas fa-cog"></i> Alterar Status do Chamado
@@ -126,7 +126,7 @@
         </div>
         {% endif %}
         
-        {% if current_user.tipo == 'admin' %}
+        {% if current_user.tipo == 'Admin' %}
         <div class="card" style="background: #fffaf0; border-left: 4px solid #ed8936;">
           <h3 style="color: #2d3748; margin-bottom: 1rem; font-weight: 600;">
             <i class="fas fa-eye"></i> Comentário interno
