@@ -1,10 +1,41 @@
-# -*- coding: utf-8 -*-
-"""
-Configuração segura para GitHub
-A configuração real será descriptografada automaticamente no Render
-"""
+import os
 
-# Este arquivo será sobrescrito pelo start_render.py no Render
-# Para desenvolvimento local, use: python use_real_config.py
+class Config:
+    SECRET_KEY = 'sua_chave_secreta_aqui'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    UPLOAD_FOLDER = 'uploads'
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
+    
+    # Configuração do banco MySQL
+    # Altere estas configurações conforme seu ambiente
+    MYSQL_HOST = '46.202.151.75'
+    MYSQL_PORT = 3306
+    MYSQL_USER = 'user_bi'
+    MYSQL_PASSWORD = 'sk15iY4rVGLCoqK0'  
+    MYSQL_DATABASE = 'BI'
+    
+    @staticmethod
+    def init_app(app):
+        # Configurar a URI do banco de dados MySQL
+        if Config.MYSQL_PASSWORD:
+            app.config['SQLALCHEMY_DATABASE_URI'] = (
+                f'mysql://{Config.MYSQL_USER}:{Config.MYSQL_PASSWORD}@'
+                f'{Config.MYSQL_HOST}:{Config.MYSQL_PORT}/{Config.MYSQL_DATABASE}'
+            )
+        else:
+            app.config['SQLALCHEMY_DATABASE_URI'] = (
+                f'mysql://{Config.MYSQL_USER}@'
+                f'{Config.MYSQL_HOST}:{Config.MYSQL_PORT}/{Config.MYSQL_DATABASE}'
+            )
 
-from secure_config import config
+class DevelopmentConfig(Config):
+    DEBUG = True
+
+class ProductionConfig(Config):
+    DEBUG = False
+
+config = {
+    'development': DevelopmentConfig,
+    'production': ProductionConfig,
+    'default': DevelopmentConfig
+}

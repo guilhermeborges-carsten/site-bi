@@ -1,119 +1,210 @@
 {% extends 'base.html' %}
 {% block title %}Detalhes do Chamado - Sistema BI{% endblock %}
 {% block content %}
-  <div style="max-width: 900px; margin: 0 auto;">
-    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-      <a href="{{ url_for('dashboard') }}" class="btn" style="flex: 0 0 auto;">
-        <i class="fas fa-arrow-left"></i>
-        Voltar
-      </a>
-      <h1 style="margin: 0; flex: 1;">{{ chamado.titulo }}</h1>
+  <div class="fade-in" style="max-width: 1000px; margin: 0 auto;">
+    <!-- Header com Navegação -->
+    <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <a href="{{ url_for('dashboard') }}" class="btn" 
+             style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 0.75rem 1.5rem; text-decoration: none; border-radius: 8px; transition: all 0.3s;">
+            <i class="fas fa-arrow-left" style="margin-right: 0.5rem;"></i>
+            Voltar ao Dashboard
+          </a>
+          <div>
+            <h1 style="margin: 0; font-size: 2rem; font-weight: 700; line-height: 1.2;">
+              {{ chamado.titulo }}
+            </h1>
+            <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem; opacity: 0.9;">
+              Protocolo: <strong>{{ chamado.protocolo }}</strong>
+            </p>
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 3rem; opacity: 0.8;">
+            <i class="fas fa-ticket-alt"></i>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- Informações do Chamado -->
-    <div class="card">
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-        <div>
-          <h3 style="color: #2d3748; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-info-circle"></i>
+    <!-- Grid Principal de Informações -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 2rem; margin-bottom: 2rem;">
+      
+      <!-- Coluna Esquerda - Informações Principais -->
+      <div>
+        <!-- Card de Informações do Chamado -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <h3 style="color: #2d3748; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+            <i class="fas fa-info-circle" style="color: #667eea;"></i>
             Informações do Chamado
           </h3>
-          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-            <div>
-              <label style="font-weight: 600; color: #4a5568;">Protocolo:</label>
-              <p style="margin: 0.25rem 0; color: #2d3748;">{{ chamado.protocolo }}</p>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div class="info-item">
+                <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-hashtag" style="margin-right: 0.5rem; color: #667eea;"></i>
+                  Protocolo
+                </label>
+                <p style="margin: 0.25rem 0; color: #2d3748; font-size: 1.1rem; font-weight: 600;">{{ chamado.protocolo }}</p>
+              </div>
+              
+              <div class="info-item">
+                <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-user-tie" style="margin-right: 0.5rem; color: #667eea;"></i>
+                  Cargo
+                </label>
+                <p style="margin: 0.25rem 0; color: #2d3748; font-size: 1.1rem;">{{ chamado.cargo or 'Não informado' }}</p>
+              </div>
+              
+              <div class="info-item">
+                <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-building" style="margin-right: 0.5rem; color: #667eea;"></i>
+                  Setor
+                </label>
+                <p style="margin: 0.25rem 0; color: #2d3748; font-size: 1.1rem;">{{ chamado.setor or 'Não informado' }}</p>
+              </div>
+              
+              <div class="info-item">
+                <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-tags" style="margin-right: 0.5rem; color: #667eea;"></i>
+                  Segmentação
+                </label>
+                <p style="margin: 0.25rem 0; color: #2d3748; font-size: 1.1rem;">{{ chamado.segmentacao or 'Não informado' }}</p>
+              </div>
             </div>
-            <div>
-              <label style="font-weight: 600; color: #4a5568;">Cargo:</label>
-              <p style="margin: 0.25rem 0; color: #2d3748;">{{ chamado.cargo }}</p>
-            </div>
-            <div>
-              <label style="font-weight: 600; color: #4a5568;">Setor:</label>
-              <p style="margin: 0.25rem 0; color: #2d3748;">{{ chamado.setor }}</p>
-            </div>
-            <div>
-              <label style="font-weight: 600; color: #4a5568;">Segmentação:</label>
-              <p style="margin: 0.25rem 0; color: #2d3748;">{{ chamado.segmentacao }}</p>
-            </div>
-            <div>
-              <label style="font-weight: 600; color: #4a5568;">Tipo de Projeto:</label>
-              <p style="margin: 0.25rem 0; color: #2d3748;">{{ chamado.tipo_projeto }}</p>
-            </div>
-            <div>
-              <label style="font-weight: 600; color: #4a5568;">Objetivo:</label>
-              <p style="margin: 0.25rem 0; color: #2d3748;">{{ chamado.objetivo }}</p>
-            </div>
-            <div>
-              <label style="font-weight: 600; color: #4a5568;">Urgência:</label>
-              <span style="
-                padding: 0.25rem 0.75rem; 
-                border-radius: 20px; 
-                font-size: 0.85rem; 
-                font-weight: 600;
-                {% if chamado.urgencia == 'Baixa' %}background: #c6f6d5; color: #22543d;
-                {% elif chamado.urgencia == 'Média' %}background: #fef5e7; color: #744210;
-                {% elif chamado.urgencia == 'Alta' %}background: #fed7d7; color: #742a2a;
-                {% else %}background: #fed7d7; color: #742a2a;{% endif %}
-              ">
-                {{ chamado.urgencia }}
-              </span>
+            
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div class="info-item">
+                <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-project-diagram" style="margin-right: 0.5rem; color: #667eea;"></i>
+                  Tipo de Projeto
+                </label>
+                <p style="margin: 0.25rem 0; color: #2d3748; font-size: 1.1rem;">{{ chamado.tipo_projeto or 'Não informado' }}</p>
+              </div>
+              
+              <div class="info-item">
+                <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-bullseye" style="margin-right: 0.5rem; color: #667eea;"></i>
+                  Objetivo
+                </label>
+                <p style="margin: 0.25rem 0; color: #2d3748; font-size: 1.1rem; line-height: 1.5;">{{ chamado.objetivo or 'Não informado' }}</p>
+              </div>
+              
+              <div class="info-item">
+                <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem; color: #667eea;"></i>
+                  Urgência
+                </label>
+                <div style="margin-top: 0.5rem;">
+                  <span class="urgencia-badge urgencia-{{ chamado.urgencia.lower() if chamado.urgencia else 'baixa' }}">
+                    <i class="fas fa-exclamation-triangle" style="margin-right: 0.5rem;"></i>
+                    {{ chamado.urgencia or 'Não definida' }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-        
-        <div>
-          <h3 style="color: #2d3748; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-            <i class="fas fa-tasks"></i>
+
+        <!-- Card de Descrição -->
+        <div class="card">
+          <h3 style="color: #2d3748; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+            <i class="fas fa-align-left" style="color: #667eea;"></i>
+            Descrição do Chamado
+          </h3>
+          <div style="background: #f7fafc; padding: 1.5rem; border-radius: 8px; border-left: 4px solid #667eea;">
+            <p style="color: #4a5568; line-height: 1.7; margin: 0; font-size: 1.05rem;">
+              {{ chamado.descricao or 'Nenhuma descrição fornecida.' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Coluna Direita - Status e Controles -->
+      <div>
+        <!-- Card de Status -->
+        <div class="card" style="margin-bottom: 2rem;">
+          <h3 style="color: #2d3748; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+            <i class="fas fa-tasks" style="color: #667eea;"></i>
             Status e Controle
           </h3>
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
+          
+          <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <!-- Status Atual -->
             <div>
-              <label style="font-weight: 600; color: #4a5568;">Status Atual:</label>
-              <div style="margin-top: 0.5rem;">
-                <span style="
-                  padding: 0.5rem 1rem; 
-                  border-radius: 8px; 
-                  font-weight: 600;
-                  {% if chamado.status == 'Aberto' %}background: #c6f6d5; color: #22543d;
-                  {% elif chamado.status == 'Em andamento' %}background: #fef5e7; color: #744210;
-                  {% elif chamado.status == 'Finalizado' %}background: #bee3f8; color: #2a4365;
-                  {% else %}background: #fed7d7; color: #742a2a;{% endif %}
-                ">
+              <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                Status Atual
+              </label>
+              <div style="margin-top: 0.75rem;">
+                <span class="status-badge status-{{ chamado.status.lower().replace(' ', '-') }}">
                   <i class="fas fa-circle" style="font-size: 0.75rem; margin-right: 0.5rem;"></i>
                   {{ chamado.status }}
                 </span>
               </div>
             </div>
             
+            <!-- Responsável -->
+            <div>
+              <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-user-check" style="margin-right: 0.5rem; color: #667eea;"></i>
+                Responsável
+              </label>
+              <div style="margin-top: 0.75rem;">
+                {% if chamado.responsavel %}
+                  <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: #f0fff4; border-radius: 8px; border: 1px solid #c6f6d5;">
+                    <i class="fas fa-user-circle" style="color: #38a169; font-size: 1.2rem;"></i>
+                    <span style="color: #22543d; font-weight: 600;">{{ chamado.responsavel.nome }}</span>
+                    <span style="background: #38a169; color: white; padding: 0.25rem 0.5rem; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+                      {{ chamado.responsavel.tipo }}
+                    </span>
+                  </div>
+                {% else %}
+                  <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; background: #fef5e7; border-radius: 8px; border: 1px solid #fbd38e;">
+                    <i class="fas fa-user-clock" style="color: #d69e2e; font-size: 1.2rem;"></i>
+                    <span style="color: #744210; font-weight: 600;">Aguardando atribuição</span>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <!-- Alterar Status (Apenas Admin) -->
             {% if current_user.tipo == 'Admin' %}
             <div>
-              <form method="POST" style="display: flex; gap: 0.5rem; align-items: end;">
-                <div style="flex: 1;">
-                  <label for="novo_status" style="font-weight: 600; color: #4a5568;">Alterar Status:</label>
-                  <select name="novo_status" id="novo_status" style="margin-top: 0.25rem;">
-                    <option value="Aberto" {% if chamado.status=='Aberto' %}selected{% endif %}>Aberto</option>
-                    <option value="Em andamento" {% if chamado.status=='Em andamento' %}selected{% endif %}>Em andamento</option>
-                    <option value="Finalizado" {% if chamado.status=='Finalizado' %}selected{% endif %}>Finalizado</option>
-                    <option value="Fechado" {% if chamado.status=='Fechado' %}selected{% endif %}>Fechado</option>
-                  </select>
-                </div>
-                <button type="submit" class="btn btn-success">
-                  <i class="fas fa-save"></i>
-                  Salvar
+              <form method="POST" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                <label for="novo_status" style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                  <i class="fas fa-edit" style="margin-right: 0.5rem; color: #667eea;"></i>
+                  Alterar Status
+                </label>
+                <select name="novo_status" id="novo_status" 
+                        style="padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; background: white;">
+                  <option value="Aberto" {% if chamado.status=='Aberto' %}selected{% endif %}>Aberto</option>
+                  <option value="Em andamento" {% if chamado.status=='Em andamento' %}selected{% endif %}>Em andamento</option>
+                  <option value="Finalizado" {% if chamado.status=='Finalizado' %}selected{% endif %}>Finalizado</option>
+                  <option value="Fechado" {% if chamado.status=='Fechado' %}selected{% endif %}>Fechado</option>
+                </select>
+                <button type="submit" class="btn btn-success" style="width: 100%;">
+                  <i class="fas fa-save" style="margin-right: 0.5rem;"></i>
+                  Atualizar Status
                 </button>
               </form>
             </div>
             {% endif %}
             
+            <!-- Anexo -->
             {% if chamado.anexo %}
             <div>
-              <label style="font-weight: 600; color: #4a5568;">Anexo:</label>
-              <div style="margin-top: 0.5rem;">
+              <label style="font-weight: 600; color: #4a5568; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px;">
+                <i class="fas fa-paperclip" style="margin-right: 0.5rem; color: #667eea;"></i>
+                Anexo
+              </label>
+              <div style="margin-top: 0.75rem;">
                 <a href="{{ url_for('download_anexo', filename=chamado.anexo) }}" 
                    class="btn" 
-                   style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none;"
+                   style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; background: #f7fafc; color: #4a5568; border: 2px solid #e2e8f0; padding: 0.75rem 1rem; border-radius: 8px; transition: all 0.2s;"
                    target="_blank">
-                  <i class="fas fa-download"></i>
+                  <i class="fas fa-download" style="color: #667eea;"></i>
                   {{ chamado.anexo }}
                 </a>
               </div>
@@ -121,98 +212,309 @@
             {% endif %}
           </div>
         </div>
-      </div>
-      
-      <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
-        <h3 style="color: #2d3748; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-          <i class="fas fa-align-left"></i>
-          Descrição
-        </h3>
-        <p style="color: #4a5568; line-height: 1.6; margin: 0;">{{ chamado.descricao }}</p>
+
+        <!-- Card de Estatísticas -->
+        <div class="card">
+          <h3 style="color: #2d3748; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+            <i class="fas fa-chart-bar" style="color: #667eea;"></i>
+            Estatísticas
+          </h3>
+          
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7fafc; border-radius: 8px;">
+              <span style="color: #4a5568; font-weight: 600;">Total de Mensagens</span>
+              <span style="background: #667eea; color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+                {{ mensagens|length }}
+              </span>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: #f7fafc; border-radius: 8px;">
+              <span style="color: #4a5568; font-weight: 600;">Criado por</span>
+              <span style="color: #2d3748; font-weight: 600;">
+                {% set criador = usuarios|selectattr('id', 'equalto', chamado.usuario_id)|first %}
+                {{ criador.nome if criador else 'Usuário ' ~ chamado.usuario_id }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Mensagens -->
+    <!-- Seção de Mensagens -->
     <div class="card">
-      <h3 style="color: #2d3748; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem;">
-        <i class="fas fa-comments"></i>
-        Mensagens
-      </h3>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="color: #2d3748; margin: 0; display: flex; align-items: center; gap: 0.5rem; font-size: 1.3rem;">
+          <i class="fas fa-comments" style="color: #667eea;"></i>
+          Conversa do Chamado
+        </h3>
+        <span style="background: #667eea; color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+          {{ mensagens|length }} mensagem{{ 'es' if mensagens|length != 1 else '' }}
+        </span>
+      </div>
       
-      <div style="max-height: 400px; overflow-y: auto; margin-bottom: 1.5rem;">
+      <!-- Lista de Mensagens -->
+      <div style="max-height: 500px; overflow-y: auto; margin-bottom: 2rem; padding-right: 0.5rem;">
         {% if mensagens %}
           {% for msg in mensagens %}
-          <div style="
-            margin-bottom: 1rem; 
-            padding: 1rem; 
+          <div class="mensagem-item" style="
+            margin-bottom: 1.5rem; 
+            padding: 1.5rem; 
             background: #f7fafc; 
             border-radius: 12px; 
             border-left: 4px solid #667eea;
+            transition: all 0.2s;
           ">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <i class="fas fa-user-circle" style="color: #667eea; font-size: 1.2rem;"></i>
-                <span style="font-weight: 600; color: #2d3748;">
-                  {% set autor = usuarios|selectattr('id', 'equalto', msg.autor_id)|first %}
-                  {{ autor.nome if autor else 'Usuário ' ~ msg.autor_id }}
-                </span>
-                <span style="
-                  padding: 0.25rem 0.5rem; 
-                  background: #e2e8f0; 
-                  color: #4a5568; 
-                  border-radius: 12px; 
-                  font-size: 0.75rem; 
-                  font-weight: 500;
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="
+                  width: 40px; 
+                  height: 40px; 
+                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                  border-radius: 50%; 
+                  display: flex; 
+                  align-items: center; 
+                  justify-content: center; 
+                  color: white; 
+                  font-weight: 600;
                 ">
-                  {{ autor.tipo|capitalize if autor else 'Usuário' }}
-                </span>
+                  {% set autor = usuarios|selectattr('id', 'equalto', msg.autor_id)|first %}
+                  {{ (autor.nome[0] if autor and autor.nome else 'U')|upper }}
+                </div>
+                <div>
+                  <div style="font-weight: 600; color: #2d3748; font-size: 1.1rem;">
+                    {{ autor.nome if autor else 'Usuário ' ~ msg.autor_id }}
+                  </div>
+                  <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="
+                      padding: 0.25rem 0.75rem; 
+                      background: {% if autor and autor.tipo == 'Admin' %}#667eea{% else %}#38a169{% endif %}; 
+                      color: white; 
+                      border-radius: 12px; 
+                      font-size: 0.75rem; 
+                      font-weight: 600;
+                    ">
+                      {{ autor.tipo|capitalize if autor else 'Usuário' }}
+                    </span>
+                    {% if msg.autor_id == chamado.usuario_id %}
+                    <span style="
+                      padding: 0.25rem 0.5rem; 
+                      background: #fef5e7; 
+                      color: #d69e2e; 
+                      border-radius: 12px; 
+                      font-size: 0.75rem; 
+                      font-weight: 600;
+                    ">
+                      <i class="fas fa-user" style="margin-right: 0.25rem;"></i>
+                      Criador
+                    </span>
+                    {% endif %}
+                  </div>
+                </div>
               </div>
-              <small style="color: #718096;">
-                {% set data_brasilia = msg.data_envio|to_brasilia %}
-                {{ data_brasilia.strftime('%d/%m/%Y %H:%M') }}
-              </small>
+              <div style="text-align: right;">
+                <small style="color: #718096; font-size: 0.9rem;">
+                  {% set data_brasilia = msg.data_envio|to_brasilia %}
+                  {{ data_brasilia.strftime('%d/%m/%Y') }}
+                </small>
+                <br>
+                <small style="color: #a0aec0; font-size: 0.8rem;">
+                  {{ data_brasilia.strftime('%H:%M') }}
+                </small>
+              </div>
             </div>
-            <p style="color: #4a5568; margin: 0; line-height: 1.5;">{{ msg.conteudo }}</p>
+            <div style="
+              background: white; 
+              padding: 1rem; 
+              border-radius: 8px; 
+              border: 1px solid #e2e8f0;
+              line-height: 1.6;
+            ">
+              <p style="color: #4a5568; margin: 0; font-size: 1rem;">{{ msg.conteudo }}</p>
+            </div>
           </div>
           {% endfor %}
         {% else %}
-          <div style="text-align: center; padding: 2rem; color: #718096;">
-            <i class="fas fa-comment-slash" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
-            <p style="margin: 0;">Nenhuma mensagem ainda.</p>
-            <small>Seja o primeiro a comentar!</small>
+          <div style="text-align: center; padding: 3rem 2rem; background: #f7fafc; border: 2px dashed #cbd5e0; border-radius: 12px;">
+            <div style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;">
+              <i class="fas fa-comment-slash"></i>
+            </div>
+            <h4 style="color: #718096; margin-bottom: 0.5rem;">Nenhuma mensagem ainda</h4>
+            <p style="color: #a0aec0; margin: 0;">Seja o primeiro a comentar sobre este chamado!</p>
           </div>
         {% endif %}
       </div>
 
-      <!-- Formulário de nova mensagem -->
-      <form method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
-        <div>
-          <label for="mensagem" style="font-weight: 600; color: #4a5568;">Nova Mensagem:</label>
-          <textarea 
-            name="mensagem" 
-            id="mensagem" 
-            placeholder="Digite sua mensagem..." 
-            required 
-            rows="4"
-            style="margin-top: 0.5rem;"
-          ></textarea>
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <button type="submit" class="btn btn-success" style="flex: 1;">
-            <i class="fas fa-paper-plane"></i>
-            Enviar Mensagem
-          </button>
-        </div>
-      </form>
+      <!-- Formulário de Nova Mensagem -->
+      <div style="background: #f7fafc; padding: 1.5rem; border-radius: 12px; border: 2px solid #e2e8f0;">
+        <h4 style="color: #2d3748; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-paper-plane" style="color: #667eea;"></i>
+          Enviar Nova Mensagem
+        </h4>
+        
+        <form method="POST" style="display: flex; flex-direction: column; gap: 1rem;">
+          <div>
+            <textarea 
+              name="mensagem" 
+              id="mensagem" 
+              placeholder="Digite sua mensagem aqui... (mínimo 10 caracteres)" 
+              required 
+              rows="4"
+              style="
+                width: 100%; 
+                padding: 1rem; 
+                border: 2px solid #e2e8f0; 
+                border-radius: 8px; 
+                font-size: 1rem; 
+                font-family: inherit; 
+                resize: vertical; 
+                transition: border-color 0.2s;
+              "
+              minlength="10"
+            ></textarea>
+          </div>
+          
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <small style="color: #718096;">
+              <i class="fas fa-info-circle" style="margin-right: 0.25rem;"></i>
+              Sua mensagem será visível para todos os participantes
+            </small>
+            <button type="submit" class="btn btn-success" style="
+              padding: 0.875rem 2rem; 
+              background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); 
+              border: none; 
+              color: white; 
+              font-weight: 600; 
+              border-radius: 8px; 
+              font-size: 1rem;
+              transition: transform 0.2s;
+            ">
+              <i class="fas fa-paper-plane" style="margin-right: 0.5rem;"></i>
+              Enviar Mensagem
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   </div>
 
   <style>
+    .info-item {
+      padding: 1rem;
+      background: #f7fafc;
+      border-radius: 8px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s;
+    }
+    
+    .info-item:hover {
+      background: #edf2f7;
+      border-color: #cbd5e0;
+      transform: translateY(-1px);
+    }
+    
+    .status-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .status-aberto { background: #f0fff4; color: #22543d; border: 2px solid #c6f6d5; }
+    .status-em-andamento { background: #fef5e7; color: #744210; border: 2px solid #fbd38e; }
+    .status-finalizado { background: #e6fffa; color: #2a4365; border: 2px solid #9ae6b4; }
+    .status-fechado { background: #fed7d7; color: #742a2a; border: 2px solid #feb2b2; }
+    
+    .urgencia-badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+    }
+    
+    .urgencia-baixa { background: #f0fff4; color: #22543d; border: 2px solid #c6f6d5; }
+    .urgencia-média { background: #fef5e7; color: #744210; border: 2px solid #fbd38e; }
+    .urgencia-alta { background: #fed7d7; color: #742a2a; border: 2px solid #feb2b2; }
+    
+    .mensagem-item:hover {
+      background: #edf2f7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     @media (max-width: 768px) {
       .card > div[style*="grid"] {
         grid-template-columns: 1fr !important;
         gap: 1.5rem !important;
       }
+      
+      .info-item {
+        padding: 0.75rem;
+      }
+      
+      .mensagem-item {
+        padding: 1rem;
+      }
     }
   </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Auto-resize do textarea
+      const textarea = document.getElementById('mensagem');
+      if (textarea) {
+        textarea.addEventListener('input', function() {
+          this.style.height = 'auto';
+          this.style.height = this.scrollHeight + 'px';
+        });
+        
+        // Focar no textarea quando a página carregar
+        textarea.focus();
+      }
+      
+      // Scroll suave para o formulário quando não há mensagens
+      const mensagens = document.querySelectorAll('.mensagem-item');
+      if (mensagens.length === 0) {
+        const form = document.querySelector('form');
+        if (form) {
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+      
+      // Efeito de destaque nas mensagens não lidas
+      const mensagensNaoLidas = document.querySelectorAll('.mensagem-item:not(.lida)');
+      mensagensNaoLidas.forEach(msg => {
+        msg.style.animation = 'pulse 2s infinite';
+      });
+    });
+  </script>
 {% endblock %}

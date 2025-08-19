@@ -237,27 +237,36 @@ def dashboard():
         data_ini = request.args.get('data_ini')
         data_fim = request.args.get('data_fim')
         urgencia = request.args.get('urgencia')
+        categoria = request.args.get('categoria')
         query = Chamado.query.filter_by(usuario_id=current_user.id)
         if status and status != 'todos':
             query = query.filter_by(status=status)
-        if data_ini:
+        if data_ini and data_ini.strip():
             try:
                 data_ini_dt = datetime.strptime(data_ini, '%Y-%m-%d')
-                chamados_ids = [c.id for c in query.all() 
-                    if (msg := Mensagem.query.filter_by(chamado_id=c.id).order_by(Mensagem.data_envio).first()) and msg.data_envio >= data_ini_dt]
-                query = query.filter(Chamado.id.in_(chamados_ids))
-            except:
+                # Filtrar por data da primeira mensagem do chamado
+                subquery = db.session.query(Mensagem.chamado_id).filter(
+                    Mensagem.data_envio >= data_ini_dt
+                ).subquery()
+                query = query.filter(Chamado.id.in_(subquery))
+            except Exception as e:
+                print(f"Erro ao filtrar por data inicial: {e}")
                 pass
-        if data_fim:
+        if data_fim and data_fim.strip():
             try:
                 data_fim_dt = datetime.strptime(data_fim, '%Y-%m-%d')
-                chamados_ids = [c.id for c in query.all() 
-                    if (msg := Mensagem.query.filter_by(chamado_id=c.id).order_by(Mensagem.data_envio).first()) and msg.data_envio <= data_fim_dt]
-                query = query.filter(Chamado.id.in_(chamados_ids))
-            except:
+                # Filtrar por data da primeira mensagem do chamado
+                subquery = db.session.query(Mensagem.chamado_id).filter(
+                    Mensagem.data_envio <= data_fim_dt
+                ).subquery()
+                query = query.filter(Chamado.id.in_(subquery))
+            except Exception as e:
+                print(f"Erro ao filtrar por data final: {e}")
                 pass
-        if urgencia:
+        if urgencia and urgencia != 'todos':
             query = query.filter_by(urgencia=urgencia)
+        if categoria and categoria != 'todas':
+            query = query.filter_by(cargo=categoria)  # Usar campo cargo como categoria
         chamados = query.all()
         # Opções de categoria removidas
         # Identificar chamados com mensagens não lidas
@@ -268,9 +277,13 @@ def dashboard():
                 if msg.autor_id != current_user.id and not MensagemLida.query.filter_by(mensagem_id=msg.id, usuario_id=current_user.id).first():
                     chamados_nao_lidos.add(chamado.id)
                     break
+        # Buscar colaboradores e categorias para os filtros
+        colaboradores = Usuario.query.filter_by(tipo='Admin').all()
+        categorias = ['Suporte', 'Desenvolvimento', 'Infraestrutura', 'Dados', 'Outros']
+        
         return render_template('dashboard.html', chamados=chamados, filtros={
-            'status': status, 'data_ini': data_ini, 'data_fim': data_fim, 'urgencia': urgencia
-        }, chamados_nao_lidos=chamados_nao_lidos)
+            'status': status, 'data_ini': data_ini, 'data_fim': data_fim, 'urgencia': urgencia, 'categoria': categoria
+        }, chamados_nao_lidos=chamados_nao_lidos, colaboradores=colaboradores, categorias=categorias)
 
 @app.route('/novo_chamado', methods=['GET', 'POST'])
 @login_required

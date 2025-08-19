@@ -2,188 +2,359 @@
 {% block title %}Dashboard - Sistema BI{% endblock %}
 {% block content %}
   <div class="fade-in">
-    <div class="card">
-      <h1 style="margin-bottom: 1.5rem; color: #2d3748; font-size: 2rem; font-weight: 700;">
-        <i class="fas fa-tachometer-alt"></i> Bem-vindo, {{ current_user.nome }}
-      </h1>
-      
-      <!-- Filtros -->
-      <div class="card" style="margin-bottom: 2rem;">
-        <h3 style="margin-bottom: 1.5rem; color: #2d3748; font-weight: 600;">
-          <i class="fas fa-filter"></i> Filtros
-        </h3>
-        <div class="filtros-box" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-          {% if current_user.tipo == 'Admin' %}
-            <div class="form-group">
-              <label for="status">Status</label>
-              <select id="status" name="status">
-                <option value="todos">Todos</option>
-                <option value="Aberto" {% if filtros.status=='Aberto' %}selected{% endif %}>Aberto</option>
-                <option value="Em andamento" {% if filtros.status=='Em andamento' %}selected{% endif %}>Em andamento</option>
-                <option value="Finalizado" {% if filtros.status=='Finalizado' %}selected{% endif %}>Finalizado</option>
-                <option value="Fechado" {% if filtros.status=='Fechado' %}selected{% endif %}>Fechado</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="urgencia">Urgência</label>
-              <select id="urgencia" name="urgencia">
-                <option value="todos">Todas</option>
-                <option value="Baixa" {% if filtros.urgencia=='Baixa' %}selected{% endif %}>Baixa</option>
-                <option value="Média" {% if filtros.urgencia=='Média' %}selected{% endif %}>Média</option>
-                <option value="Alta" {% if filtros.urgencia=='Alta' %}selected{% endif %}>Alta</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="colaborador">Colaborador</label>
-              <select id="colaborador" name="colaborador">
-                <option value="todos">Todos</option>
-                {% for colab in colaboradores %}
-                <option value="{{ colab.id }}" {% if filtros.colaborador==colab.id|string %}selected{% endif %}>{{ colab.nome }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          {% else %}
-            <div class="form-group">
-              <label for="status">Status</label>
-              <select id="status" name="status">
-                <option value="todos">Todos</option>
-                <option value="Aberto" {% if filtros.status=='Aberto' %}selected{% endif %}>Aberto</option>
-                <option value="Em andamento" {% if filtros.status=='Em andamento' %}selected{% endif %}>Em andamento</option>
-                <option value="Finalizado" {% if filtros.status=='Finalizado' %}selected{% endif %}>Finalizado</option>
-                <option value="Fechado" {% if filtros.status=='Fechado' %}selected{% endif %}>Fechado</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="urgencia">Urgência</label>
-              <select id="urgencia" name="urgencia">
-                <option value="todos">Todas</option>
-                <option value="Baixa" {% if filtros.urgencia=='Baixa' %}selected{% endif %}>Baixa</option>
-                <option value="Média" {% if filtros.urgencia=='Média' %}selected{% endif %}>Média</option>
-                <option value="Alta" {% if filtros.urgencia=='Alta' %}selected{% endif %}>Alta</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="categoria">Categoria</label>
-              <select id="categoria" name="categoria">
-                <option value="todas">Todas</option>
-                {% for cat in categorias %}
-                <option value="{{ cat }}" {% if filtros.categoria==cat %}selected{% endif %}>{{ cat }}</option>
-                {% endfor %}
-              </select>
-            </div>
-          {% endif %}
-          <div class="form-group">
-            <label for="data_ini">Data Inicial</label>
-            <input type="date" id="data_ini" name="data_ini" value="{{ filtros.data_ini or '' }}">
-          </div>
-          <div class="form-group">
-            <label for="data_fim">Data Final</label>
-            <input type="date" id="data_fim" name="data_fim" value="{{ filtros.data_fim or '' }}">
-          </div>
-          <div class="form-group" style="display: flex; align-items: end;">
-            <button type="submit" class="btn" style="width: 100%;">
-              <i class="fas fa-filter"></i> Filtrar
-            </button>
+    <!-- Header com Boas-vindas -->
+    <div class="card" style="margin-bottom: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <h1 style="margin: 0; font-size: 2.2rem; font-weight: 700;">
+            <i class="fas fa-tachometer-alt" style="margin-right: 0.5rem;"></i>
+            Bem-vindo, {{ current_user.nome }}
+          </h1>
+          <p style="margin: 0.5rem 0 0 0; font-size: 1.1rem; opacity: 0.9;">
+            Gerencie seus chamados e acompanhe o progresso
+          </p>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 3rem; opacity: 0.8;">
+            <i class="fas fa-ticket-alt"></i>
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Lista de Chamados -->
+    <!-- Estatísticas Rápidas -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <h3 style="margin-bottom: 1.5rem; color: #2d3748; font-weight: 600; display: flex; align-items: center;">
+        <i class="fas fa-chart-bar" style="margin-right: 0.5rem; color: #667eea;"></i>
+        Resumo dos Seus Chamados
+      </h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+        <div style="text-align: center; padding: 1.5rem; background: #f7fafc; border-radius: 12px; border: 2px solid #e2e8f0;">
+          <div style="font-size: 2.5rem; color: #48bb78; margin-bottom: 0.5rem;">
+            <i class="fas fa-folder-open"></i>
+          </div>
+          <div style="font-size: 2rem; font-weight: 700; color: #2d3748; margin-bottom: 0.25rem;">
+            {{ chamados|length }}
+          </div>
+          <div style="color: #718096; font-weight: 500;">Total de Chamados</div>
+        </div>
+        
+        <div style="text-align: center; padding: 1.5rem; background: #f7fafc; border-radius: 12px; border: 2px solid #e2e8f0;">
+          <div style="font-size: 2.5rem; color: #ed8936; margin-bottom: 0.5rem;">
+            <i class="fas fa-clock"></i>
+          </div>
+          <div style="font-size: 2rem; font-weight: 700; color: #2d3748; margin-bottom: 0.25rem;">
+            {{ chamados|selectattr('status', 'equalto', 'Aberto')|list|length }}
+          </div>
+          <div style="color: #718096; font-weight: 500;">Em Aberto</div>
+        </div>
+        
+        <div style="text-align: center; padding: 1.5rem; background: #f7fafc; border-radius: 12px; border: 2px solid #e2e8f0;">
+          <div style="font-size: 2.5rem; color: #667eea; margin-bottom: 0.5rem;">
+            <i class="fas fa-spinner"></i>
+          </div>
+          <div style="font-size: 2rem; font-weight: 700; color: #2d3748; margin-bottom: 0.25rem;">
+            {{ chamados|selectattr('status', 'equalto', 'Em andamento')|list|length }}
+          </div>
+          <div style="color: #718096; font-weight: 500;">Em Andamento</div>
+        </div>
+        
+        <div style="text-align: center; padding: 1.5rem; background: #f7fafc; border-radius: 12px; border: 2px solid #e2e8f0;">
+          <div style="font-size: 2.5rem; color: #38b2ac; margin-bottom: 0.5rem;">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div style="font-size: 2rem; font-weight: 700; color: #2d3748; margin-bottom: 0.25rem;">
+            {{ chamados|selectattr('status', 'equalto', 'Finalizado')|list|length }}
+          </div>
+          <div style="color: #718096; font-weight: 500;">Finalizados</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filtros Melhorados -->
+    <div class="card" style="margin-bottom: 2rem;">
+      <h3 style="margin-bottom: 1.5rem; color: #2d3748; font-weight: 600; display: flex; align-items: center;">
+        <i class="fas fa-filter" style="margin-right: 0.5rem; color: #667eea;"></i>
+        Filtros de Busca
+      </h3>
+      <form method="GET" class="filtros-box" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem;">
+        <!-- Filtros para usuários comuns -->
+        {% if current_user.tipo != 'Admin' %}
+          <div class="form-group">
+            <label for="status" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568;">
+              <i class="fas fa-info-circle" style="margin-right: 0.25rem; color: #667eea;"></i>
+              Status
+            </label>
+            <select id="status" name="status" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s;">
+              <option value="todos">Todos os Status</option>
+              <option value="Aberto" {% if filtros.status=='Aberto' %}selected{% endif %}>Aberto</option>
+              <option value="Em andamento" {% if filtros.status=='Em andamento' %}selected{% endif %}>Em andamento</option>
+              <option value="Finalizado" {% if filtros.status=='Finalizado' %}selected{% endif %}>Finalizado</option>
+              <option value="Fechado" {% if filtros.status=='Fechado' %}selected{% endif %}>Fechado</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="urgencia" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568;">
+              <i class="fas fa-exclamation-triangle" style="margin-right: 0.25rem; color: #ed8936;"></i>
+              Urgência
+            </label>
+            <select id="urgencia" name="urgencia" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s;">
+              <option value="todos">Todas as Urgências</option>
+              <option value="Baixa" {% if filtros.urgencia=='Baixa' %}selected{% endif %}>Baixa</option>
+              <option value="Média" {% if filtros.urgencia=='Média' %}selected{% endif %}>Média</option>
+              <option value="Alta" {% if filtros.urgencia=='Alta' %}selected{% endif %}>Alta</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="categoria" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568;">
+              <i class="fas fa-tags" style="margin-right: 0.25rem; color: #38b2ac;"></i>
+              Categoria
+            </label>
+            <select id="categoria" name="categoria" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s;">
+              <option value="todas">Todas as Categorias</option>
+              {% for cat in categorias %}
+              <option value="{{ cat }}" {% if filtros.categoria==cat %}selected{% endif %}>{{ cat }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        {% endif %}
+        
+        <div class="form-group">
+          <label for="data_ini" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568;">
+            <i class="fas fa-calendar-alt" style="margin-right: 0.25rem; color: #667eea;"></i>
+            Data Inicial
+          </label>
+          <input type="date" id="data_ini" name="data_ini" value="{{ filtros.data_ini or '' }}" 
+                 style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s;">
+        </div>
+        
+        <div class="form-group">
+          <label for="data_fim" style="display: block; margin-bottom: 0.5rem; font-weight: 600; color: #4a5568;">
+            <i class="fas fa-calendar-alt" style="margin-right: 0.25rem; color: #667eea;"></i>
+            Data Final
+          </label>
+          <input type="date" id="data_fim" name="data_fim" value="{{ filtros.data_fim or '' }}" 
+                 style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 0.95rem; transition: border-color 0.2s;">
+        </div>
+        
+        <!-- Botões de Ação -->
+        <div class="form-group" style="display: flex; align-items: end;">
+          <button type="submit" class="btn" style="width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; font-weight: 600; border-radius: 8px; transition: transform 0.2s;">
+            <i class="fas fa-search" style="margin-right: 0.5rem;"></i>
+            Aplicar Filtros
+          </button>
+        </div>
+        
+        <div class="form-group" style="display: flex; align-items: end;">
+          <a href="{{ url_for('dashboard') }}" class="btn" 
+             style="width: 100%; padding: 0.875rem; text-decoration: none; text-align: center; background: #f7fafc; color: #4a5568; border: 2px solid #e2e8f0; border-radius: 8px; font-weight: 600; transition: all 0.2s;">
+            <i class="fas fa-times" style="margin-right: 0.5rem;"></i>
+            Limpar Filtros
+          </a>
+        </div>
+      </form>
+    </div>
+
+    <!-- Lista de Chamados Melhorada -->
+    <div class="card">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h3 style="margin: 0; color: #2d3748; font-weight: 600; display: flex; align-items: center;">
+          <i class="fas fa-list" style="margin-right: 0.5rem; color: #667eea;"></i>
+          Seus Chamados
+        </h3>
+        <a href="{{ url_for('novo_chamado') }}" class="btn" 
+           style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); border: none; color: white; font-weight: 600; border-radius: 8px; text-decoration: none; transition: transform 0.2s;">
+          <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
+          Novo Chamado
+        </a>
+      </div>
+
       <div class="chamados-list">
         {% if chamados %}
           {% for c in chamados %}
-          <div class="card chamado-item slide-up" style="margin-bottom: 1rem; border-left: 4px solid #667eea;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <div style="flex: 1;">
-                <a href="{{ url_for('detalhes_chamado', id=c.id) }}" class="chamado-titulo" style="text-decoration: none; color: #2d3748; font-weight: 600; font-size: 1.1rem; display: block; margin-bottom: 0.5rem;">
-                  {{ c.titulo }}
-                  {% if chamados_nao_lidos and c.id in chamados_nao_lidos %}
-                    <i class="fas fa-bell" style="color: #e53e3e; margin-left: 0.5rem;" title="Nova mensagem não lida"></i>
-                  {% endif %}
-                </a>
-                
-                <div class="chamado-meta" style="margin-bottom: 0.5rem; color: #718096; font-size: 0.9rem;">
-                  <span><i class="fas fa-hashtag"></i> Protocolo: <strong>{{ c.protocolo }}</strong></span>
-                  <span style="margin-left: 1rem;"><i class="fas fa-info-circle"></i> Status: 
-                    <span class="status-badge status-{{ c.status.lower().replace(' ', '-') }}">{{ c.status }}</span>
-                  </span>
-                </div>
-                
-                <div class="chamado-meta" style="color: #718096; font-size: 0.9rem;">
-                  <span><i class="fas fa-user"></i> Responsável: <strong>{% if c.responsavel %}{{ c.responsavel.nome }}{% else %}Não atribuído{% endif %}</strong></span>
-                  {% if c.data_criacao %}
-                  <span style="margin-left: 1rem;"><i class="fas fa-calendar"></i> Criado em: <strong>{{ c.data_criacao.strftime('%d/%m/%Y') }}</strong></span>
-                  {% endif %}
+          <div class="card chamado-item slide-up" style="margin-bottom: 1.5rem; border: 2px solid #e2e8f0; border-radius: 12px; transition: all 0.3s; border-left: 6px solid #667eea;">
+            <div style="padding: 1.5rem;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div style="flex: 1;">
+                  <a href="{{ url_for('detalhes_chamado', id=c.id) }}" class="chamado-titulo" 
+                     style="text-decoration: none; color: #2d3748; font-weight: 700; font-size: 1.25rem; display: block; margin-bottom: 0.75rem; line-height: 1.3;">
+                    {{ c.titulo }}
+                    {% if chamados_nao_lidos and c.id in chamados_nao_lidos %}
+                      <span style="display: inline-block; background: #e53e3e; color: white; font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 12px; margin-left: 0.5rem; font-weight: 600;">
+                        <i class="fas fa-bell" style="margin-right: 0.25rem;"></i>Nova
+                      </span>
+                    {% endif %}
+                  </a>
+                  
+                  <!-- Informações principais -->
+                  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; color: #718096; font-size: 0.95rem;">
+                      <i class="fas fa-hashtag" style="margin-right: 0.5rem; color: #667eea; width: 16px;"></i>
+                      <strong>Protocolo:</strong> <span style="margin-left: 0.25rem; color: #2d3748;">{{ c.protocolo }}</span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; color: #718096; font-size: 0.95rem;">
+                      <i class="fas fa-info-circle" style="margin-right: 0.5rem; color: #667eea; width: 16px;"></i>
+                      <strong>Status:</strong> 
+                      <span class="status-badge status-{{ c.status.lower().replace(' ', '-') }}" 
+                            style="margin-left: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase;">
+                        {{ c.status }}
+                      </span>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; color: #718096; font-size: 0.95rem;">
+                      <i class="fas fa-user" style="margin-right: 0.5rem; color: #667eea; width: 16px;"></i>
+                      <strong>Responsável:</strong> 
+                      <span style="margin-left: 0.25rem; color: #2d3748;">
+                        {% if c.responsavel %}{{ c.responsavel.nome }}{% else %}Não atribuído{% endif %}
+                      </span>
+                    </div>
+                    
+                    {% if c.data_criacao %}
+                    <div style="display: flex; align-items: center; color: #718096; font-size: 0.95rem;">
+                      <i class="fas fa-calendar" style="margin-right: 0.5rem; color: #667eea; width: 16px;"></i>
+                      <strong>Criado em:</strong> 
+                      <span style="margin-left: 0.25rem; color: #2d3748;">{{ c.data_criacao.strftime('%d/%m/%Y') }}</span>
+                    </div>
+                    {% endif %}
+                  </div>
+                  
+                  <!-- Tags adicionais -->
+                  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                    {% if c.urgencia %}
+                    <span style="background: {% if c.urgencia == 'Alta' %}#fed7d7{% elif c.urgencia == 'Média' %}#fef5e7{% else %}#f0fff4{% endif %}; 
+                               color: {% if c.urgencia == 'Alta' %}#c53030{% elif c.urgencia == 'Média' %}#d69e2e{% else %}#38a169{% endif %}; 
+                               padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                      <i class="fas fa-exclamation-triangle" style="margin-right: 0.25rem;"></i>
+                      {{ c.urgencia }}
+                    </span>
+                    {% endif %}
+                    
+                    {% if c.cargo %}
+                    <span style="background: #e6fffa; color: #2c7a7b; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                      <i class="fas fa-tag" style="margin-right: 0.25rem;"></i>
+                      {{ c.cargo }}
+                    </span>
+                    {% endif %}
+                  </div>
                 </div>
               </div>
-              
-              {% if current_user.tipo == 'Admin' %}
-              <div style="margin-left: 1rem;">
-                <form method="POST" action="{{ url_for('atribuir_responsavel', chamado_id=c.id) }}" style="display: flex; gap: 0.5rem; align-items: center;">
-                  <select name="responsavel_id" style="padding: 0.5rem; border-radius: 8px; border: 1px solid #e2e8f0; font-size: 0.9rem;">
-                    <option value="">-- Escolher Admin --</option>
-                    {% for Admin in colaboradores if Admin.tipo == 'Admin' %}
-                      <option value="{{ Admin.id }}" {% if c.responsavel_id == Admin.id %}selected{% endif %}>{{ Admin.nome }}</option>
-                    {% endfor %}
-                  </select>
-                  <button type="submit" class="btn" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
-                    <i class="fas fa-user-plus"></i> Atribuir
-                  </button>
-                </form>
-              </div>
-              {% endif %}
             </div>
           </div>
           {% endfor %}
         {% else %}
-          <div class="card" style="text-align: center; padding: 3rem;">
-            <i class="fas fa-inbox" style="font-size: 3rem; color: #cbd5e0; margin-bottom: 1rem;"></i>
-            <h3 style="color: #718096; margin-bottom: 0.5rem;">Nenhum chamado encontrado</h3>
-            <p style="color: #a0aec0;">Não há chamados que correspondam aos filtros selecionados.</p>
+          <div class="card" style="text-align: center; padding: 4rem 2rem; background: #f7fafc; border: 2px dashed #cbd5e0;">
+            <div style="font-size: 4rem; color: #cbd5e0; margin-bottom: 1.5rem;">
+              <i class="fas fa-inbox"></i>
+            </div>
+            <h3 style="color: #718096; margin-bottom: 0.5rem; font-size: 1.5rem;">Nenhum chamado encontrado</h3>
+            <p style="color: #a0aec0; margin-bottom: 2rem; font-size: 1.1rem;">
+              Não há chamados que correspondam aos filtros selecionados.
+            </p>
+            <a href="{{ url_for('novo_chamado') }}" class="btn" 
+               style="padding: 0.875rem 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; font-weight: 600; border-radius: 8px; text-decoration: none; font-size: 1.1rem;">
+              <i class="fas fa-plus" style="margin-right: 0.5rem;"></i>
+              Criar Primeiro Chamado
+            </a>
           </div>
         {% endif %}
       </div>
     </div>
   </div>
 
+  <style>
+    .chamado-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border-color: #667eea;
+    }
+    
+    .status-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    
+    .status-aberto { background: #f0fff4; color: #38a169; }
+    .status-em-andamento { background: #fef5e7; color: #d69e2e; }
+    .status-finalizado { background: #e6fffa; color: #2c7a7b; }
+    .status-fechado { background: #fed7d7; color: #c53030; }
+    
+    .form-group select:focus,
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+    
+    .slide-up {
+      animation: slideUp 0.5s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+
   <script>
-    // Adicionar funcionalidade aos filtros
+    // Funcionalidade melhorada para os filtros
     document.addEventListener('DOMContentLoaded', function() {
-      const filtrosForm = document.querySelector('.filtros-box');
-      const selects = filtrosForm.querySelectorAll('select');
-      const inputs = filtrosForm.querySelectorAll('input');
+      // Auto-submit quando status ou urgência mudar
+      const statusSelect = document.getElementById('status');
+      const urgenciaSelect = document.getElementById('urgencia');
+      const categoriaSelect = document.getElementById('categoria');
       
-      // Criar formulário dinâmico
-      const form = document.createElement('form');
-      form.method = 'GET';
-      form.style.display = 'none';
-      
-      // Adicionar todos os campos ao formulário
-      [...selects, ...inputs].forEach(field => {
-        const clone = field.cloneNode(true);
-        clone.name = field.name;
-        clone.value = field.value;
-        form.appendChild(clone);
-      });
-      
-      // Adicionar formulário ao DOM
-      document.body.appendChild(form);
-      
-      // Atualizar formulário quando campos mudarem
-      [...selects, ...inputs].forEach(field => {
-        field.addEventListener('change', function() {
-          const formField = form.querySelector(`[name="${this.name}"]`);
-          if (formField) {
-            formField.value = this.value;
+      if (statusSelect) {
+        statusSelect.addEventListener('change', function() {
+          if (this.value !== 'todos') {
+            this.form.submit();
           }
         });
-      });
+      }
       
-      // Submeter formulário quando botão for clicado
-      const submitBtn = filtrosForm.querySelector('button[type="submit"]');
-      submitBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        form.submit();
+      if (urgenciaSelect) {
+        urgenciaSelect.addEventListener('change', function() {
+          if (this.value !== 'todos') {
+            this.form.submit();
+          }
+        });
+      }
+      
+      if (categoriaSelect) {
+        categoriaSelect.addEventListener('change', function() {
+          if (this.value !== 'todas') {
+            this.form.submit();
+          }
+        });
+      }
+      
+      // Adicionar efeitos visuais aos campos de filtro
+      const formFields = document.querySelectorAll('.form-group select, .form-group input');
+      formFields.forEach(field => {
+        field.addEventListener('focus', function() {
+          this.style.borderColor = '#667eea';
+          this.style.boxShadow = '0 0 0 3px rgba(102, 126, 234, 0.1)';
+        });
+        
+        field.addEventListener('blur', function() {
+          this.style.borderColor = '#e2e8f0';
+          this.style.boxShadow = 'none';
+        });
       });
     });
   </script>
