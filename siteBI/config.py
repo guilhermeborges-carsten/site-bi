@@ -6,7 +6,13 @@ class Config:
     UPLOAD_FOLDER = 'uploads'
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB
     
-    # Con
+    # Configuração do banco MySQL
+    # Altere estas configurações conforme seu ambiente
+    MYSQL_HOST = '46.202.151.75'
+    MYSQL_PORT = 3306
+    MYSQL_USER = 'user_bi'
+    MYSQL_PASSWORD = 'sk15iY4rVGLCoqK0'  
+    MYSQL_DATABASE = 'BI'
     
     @staticmethod
     def init_app(app):
@@ -33,4 +39,3 @@ config = {
     'production': ProductionConfig,
     'default': DevelopmentConfig
 }
-
