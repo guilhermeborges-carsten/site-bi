@@ -1,0 +1,216 @@
+{% extends 'base.html' %}
+{% block title %}Gerenciar Colunas - Daily Board{% endblock %}
+{% block content %}
+<div class="fade-in">
+  <div class="card">
+    <div class="card-header">
+      <h2><i class="fas fa-columns"></i> Gerenciar Colunas do Daily Board</h2>
+      <p class="text-muted">Crie e gerencie as colunas do seu quadro Kanban</p>
+    </div>
+    
+    <!-- Formulário para adicionar nova coluna -->
+    <div class="card-body">
+      <form method="POST" class="form-inline main-form">
+        <div class="form-group">
+          <input type="text" name="nome" placeholder="Nome da coluna" required class="form-control">
+        </div>
+        <div class="form-group">
+          <input type="number" name="ordem" placeholder="Ordem" min="1" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-plus"></i> Adicionar Coluna
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lista de colunas existentes -->
+  <div class="card">
+    <div class="card-header">
+      <h3><i class="fas fa-list"></i> Colunas Existentes</h3>
+    </div>
+    <div class="card-body">
+      {% if listas %}
+        <div class="table-responsive">
+          <table class="table">
+            <thead>
+              <tr>
+                <th><i class="fas fa-tag"></i> Nome</th>
+                <th><i class="fas fa-sort-numeric-up"></i> Ordem</th>
+                <th><i class="fas fa-cogs"></i> Ações</th>
+                <th><i class="fas fa-plus-circle"></i> Adicionar Tarefa</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for lista in listas %}
+              <tr class="fade-in">
+                <!-- Editar nome e ordem -->
+                <td>
+                  <form method="POST" action="{{ url_for('editar_lista_kanban', lista_id=lista.id) }}" class="inline-form">
+                    <div class="form-group">
+                      <input type="text" name="nome" value="{{ lista.nome }}" required class="form-control form-control-sm">
+                    </div>
+                </td>
+                <td>
+                    <div class="form-group">
+                      <input type="number" name="ordem" value="{{ lista.ordem }}" min="1" class="form-control form-control-sm">
+                    </div>
+                </td>
+                <td>
+                  <div class="btn-group">
+                    <button type="submit" class="btn btn-success btn-sm" title="Salvar alterações">
+                      <i class="fas fa-save"></i>
+                    </button>
+                  </form>
+                  <form method="POST" action="{{ url_for('excluir_lista_kanban', lista_id=lista.id) }}" class="inline-form" onsubmit="return confirm('Tem certeza que deseja excluir esta coluna?');">
+                    <button type="submit" class="btn btn-danger btn-sm" title="Excluir coluna">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                  </div>
+                </td>
+                
+                <!-- Adicionar tarefa -->
+                <td>
+                  <form method="POST" action="{{ url_for('dailyboard_listas') }}" class="inline-form task-form">
+                    <input type="hidden" name="lista_id" value="{{ lista.id }}">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <input type="text" name="titulo" placeholder="Título da tarefa" required class="form-control form-control-sm">
+                      </div>
+                      <div class="form-group">
+                        <input type="text" name="descricao" placeholder="Descrição" class="form-control form-control-sm">
+                      </div>
+                      <div class="form-group">
+                        <select name="responsavel_id" class="form-control form-control-sm">
+                          <option value="">Responsável</option>
+                          {% for u in usuarios if u.tipo == 'admin' %}
+                          <option value="{{ u.id }}">{{ u.nome }}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-sm" title="Adicionar tarefa">
+                          <i class="fas fa-plus"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="empty-state">
+          <i class="fas fa-columns fa-3x text-muted"></i>
+          <p>Nenhuma coluna criada ainda. Crie sua primeira coluna acima!</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Botão voltar -->
+  <div class="text-center mt-4">
+    <a href="{{ url_for('dailyboard') }}" class="btn btn-secondary">
+      <i class="fas fa-arrow-left"></i> Voltar ao Daily Board
+    </a>
+  </div>
+</div>
+
+<!-- JavaScript otimizado para performance -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Debounce function para otimizar performance
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Otimização: Pré-carregar formulários
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+            }
+        });
+    });
+
+    // Otimização: Validação em tempo real com debounce
+    const inputs = document.querySelectorAll('input[required], select[required]');
+    inputs.forEach(input => {
+        const validateInput = debounce(function() {
+            const form = input.closest('form');
+            const submitBtn = form.querySelector('button[type="submit"]');
+            
+            if (input.value.trim() === '') {
+                input.style.borderColor = '#e53e3e';
+                if (submitBtn) submitBtn.disabled = true;
+            } else {
+                input.style.borderColor = '#48bb78';
+                if (submitBtn) submitBtn.disabled = false;
+            }
+        }, 300);
+        
+        input.addEventListener('input', validateInput);
+        input.addEventListener('blur', validateInput);
+    });
+
+    // Otimização: Confirmação de exclusão melhorada
+    const deleteForms = document.querySelectorAll('form[onsubmit*="confirm"]');
+    deleteForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            const confirmMsg = this.getAttribute('data-confirm') || 'Tem certeza que deseja excluir esta coluna?';
+            if (!confirm(confirmMsg)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+
+    // Otimização: Auto-focus no primeiro campo
+    const firstInput = document.querySelector('input[type="text"]');
+    if (firstInput) {
+        firstInput.focus();
+    }
+
+    // Otimização: Lazy loading para tabelas grandes
+    const table = document.querySelector('.table-responsive');
+    if (table && table.scrollHeight > window.innerHeight) {
+        table.style.maxHeight = '70vh';
+        table.style.overflowY = 'auto';
+    }
+
+    // Otimização: Feedback visual para ações
+    const flashMessages = document.querySelectorAll('.flash');
+    flashMessages.forEach(message => {
+        setTimeout(() => {
+            message.style.opacity = '0';
+            setTimeout(() => message.remove(), 300);
+        }, 5000);
+    });
+
+    // Otimização: Prevenção de múltiplos submits
+    let isSubmitting = false;
+    document.addEventListener('submit', function(e) {
+        if (isSubmitting) {
+            e.preventDefault();
+            return false;
+        }
+        isSubmitting = true;
+        setTimeout(() => { isSubmitting = false; }, 2000);
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,18 @@
+# -*- coding: utf-8 -*-
+"""
+Configuração criptografada do Site BI
+Para descriptografar, use: python use_real_config.py
+"""
+
+from local_crypto import decrypt_config
+
+# Configuração criptografada (exemplo)
+ENCRYPTED_CONFIG = """exemplo_criptografado"""
+
+# Descriptografar a configuração
+def get_decrypted_config():
+    """Retorna a configuração descriptografada"""
+    try:
+        return decrypt_config(ENCRYPTED_CONFIG)
+    except Exception as e:
+        raise Exception(f"Erro ao descriptografar configuração: {str(e)}")

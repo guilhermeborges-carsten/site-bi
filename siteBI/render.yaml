@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: sitebi
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python start_render.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.9.16
+      - key: PRODUCTION
+        value: true
+      - key: FLASK_ENV
+        value: production
+      - key: FLASK_DEBUG
+        value: false
