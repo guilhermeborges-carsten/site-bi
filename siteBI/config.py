@@ -11,7 +11,7 @@ class Config:
     MYSQL_HOST = '46.202.151.75'
     MYSQL_PORT = 3306
     MYSQL_USER = 'user_bi'
-    MYSQL_PASSWORD = 'sk15iY4rVGLCoqK0'  
+    MYSQL_PASSWORD = ''  
     MYSQL_DATABASE = 'BI'
     
     @staticmethod
@@ -39,3 +39,4 @@ config = {
     'production': ProductionConfig,
     'default': DevelopmentConfig
 }
+
