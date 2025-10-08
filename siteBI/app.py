@@ -14,6 +14,7 @@ from sqlalchemy import or_
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+import hashlib
 from datetime import datetime
 import pytz
 from collections import Counter, defaultdict
@@ -90,6 +91,26 @@ from secure_config import config
 
 # Configurar criptografia automática
 setup_crypto_automation()
+
+def verify_password_with_fallback(stored_password, provided_password):
+    """
+    Verifica senha com fallback para hashes antigos (método vazio).
+    Tenta primeiro com check_password_hash, se falhar, tenta com MD5 (método antigo).
+    """
+    try:
+        # Tenta verificação normal (funciona para hashes novos com scrypt)
+        return check_password_hash(stored_password, provided_password)
+    except (TypeError, ValueError):
+        # Se falhar, tenta verificar se é um hash antigo (MD5)
+        try:
+            # Verifica se o hash armazenado parece ser MD5 (32 caracteres hex)
+            if len(stored_password) == 32 and all(c in '0123456789abcdef' for c in stored_password.lower()):
+                # Gera hash MD5 da senha fornecida
+                provided_hash = hashlib.md5(provided_password.encode('utf-8')).hexdigest()
+                return provided_hash == stored_password.lower()
+        except:
+            pass
+        return False
 
 app = Flask(__name__)
 
@@ -214,7 +235,7 @@ def login():
         email = request.form['email']
         senha = request.form['senha']
         user = Usuario.query.filter_by(email=email).first()
-        if user and check_password_hash(user.senha, senha):
+        if user and verify_password_with_fallback(user.senha, senha):
             login_user(user)
             return redirect(url_for('dashboard'))
         flash('Credenciais inválidas')
@@ -380,7 +401,7 @@ def cadastro():
             flash('Email já cadastrado')
             return render_template('cadastro.html')
         
-        senha_hash = generate_password_hash(senha)
+        senha_hash = generate_password_hash(senha, method='scrypt')
         novo_usuario = Usuario()
         novo_usuario.nome = nome
         novo_usuario.email = email
@@ -415,7 +436,7 @@ def admin_novo_usuario():
             return render_template('admin_novo_usuario.html')
         
         # Criar novo usuário
-        senha_hash = generate_password_hash(senha)
+        senha_hash = generate_password_hash(senha, method='scrypt')
         novo_usuario = Usuario()
         novo_usuario.nome = nome
         novo_usuario.email = email
@@ -477,7 +498,7 @@ def editar_usuario(id):
         usuario.email = request.form['email']
         usuario.tipo = request.form['tipo']
         if request.form['senha']:
-            usuario.senha = generate_password_hash(request.form['senha'])
+            usuario.senha = generate_password_hash(request.form['senha'], method='scrypt')
         db.session.commit()
         # Log de auditoria
         log = AuditoriaLog()
